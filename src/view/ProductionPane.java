@@ -3,6 +3,9 @@ package view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.text.spi.NumberFormatProvider;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -20,6 +23,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+import db.Ingredients;
 import db.Product;
 import db.ProductMap;
 
@@ -28,12 +32,14 @@ public class ProductionPane extends BasicPane{
 	
 	DefaultTableModel ingrTableModel;
 	ProductMap pr;
+	Ingredients in;
 	DefaultListModel listModel;
 	JList list;
 	JTextField quantityText;
 	int id = 1;
 
-	public ProductionPane(ProductMap pr) {
+	public ProductionPane(ProductMap pr, Ingredients in) {
+		this.in = in;
 		this.pr = pr;
 		setUpPane();
 	}
@@ -66,6 +72,7 @@ public class ProductionPane extends BasicPane{
 
 		quantityText = new JTextField(5);
 		quantityText.setText("1");
+		quantityText.addKeyListener(new QuantityKeyListener());
 		JPanel p = new JPanel();
 		p.add(p1);
 		p.add(quantityText);
@@ -85,14 +92,35 @@ public class ProductionPane extends BasicPane{
 		 return simulationScrollPane;
 	}
 	
+	
+	class QuantityKeyListener implements KeyListener{
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {}
+
+		@Override
+		public void keyTyped(KeyEvent e) {}
+		
+	}
+	
 	class ActionHandler implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			
+//			for(int i = 0; i < ingrTableModel.getRowCount(); i++)
+//				ingrTableModel.setValueAt(aValue, 1, i);
 		}
 		
 	}
+	
+	
 	
 	class ListFocusListener implements ListSelectionListener{
 
@@ -101,15 +129,25 @@ public class ProductionPane extends BasicPane{
 			Product p = pr.getProduct((String)list.getSelectedValue());
 			for(int i = 0; i < ingrTableModel.getRowCount(); i++)
 				ingrTableModel.removeRow(0);
-			ArrayList<String> ingredients = p.getIngredients();
+			ArrayList<String> ingredientNames = p.getIngredients();
 			ArrayList<Integer> neededAmount = p.getQuantities();
-			int quantity = Integer.valueOf(quantityText.getText());
-			for(int i = 0; i < ingredients.size(); i++){
+			int quantity;
+			try{
+				quantity = Integer.valueOf(quantityText.getText());
+			} catch (NumberFormatException nfe) {
+				quantity = 1;
+			}
+			for(int i = 0; i < ingredientNames.size(); i++){
 				String[] row = new String[3];
-				row[0] = ingredients.get(i);
-				row[1] = String.valueOf(neededAmount.get(i)*quantity);
-				row[2] = "";
+				String name = ingredientNames.get(i);
+				int needed = neededAmount.get(i)*quantity;
+				int available = in.getAmount(name);
+				row[0] = name;
+				row[1] = String.valueOf(needed);
+				row[2] = String.valueOf(available);
 				ingrTableModel.addRow(row);
+				if(needed > available)
+					messageLabel.setText("Not enough " + name + "!");
 			}
 				
 		}		

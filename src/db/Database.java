@@ -26,7 +26,8 @@ public class Database {
 		pa = pall;
 		pr = prod;
 		in = ingr;
-
+		updateAmounts();
+		
 		String pop = "select * from Recipes";
 		try {
 			PreparedStatement ps = conn.prepareStatement(pop);

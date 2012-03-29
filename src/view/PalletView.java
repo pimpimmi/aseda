@@ -5,6 +5,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import db.Database;
+import db.Ingredients;
 import db.PalletMap;
 import db.ProductMap;
 
@@ -33,11 +34,11 @@ public class PalletView {
 	 */
 
 
-	public PalletView(Database da, PalletMap pa, ProductMap pr) {
+	public PalletView(Database da, PalletMap pa, ProductMap pr, Ingredients in) {
 		JFrame frame = new JFrame("Krusty Pallet Program");
 		tabbedPane = new JTabbedPane();
 
-		ProductionPane productionPane = new ProductionPane(pr);
+		ProductionPane productionPane = new ProductionPane(pr, in);
 		tabbedPane.addTab("Production", null, productionPane,
 				"Produce pallets");
 
