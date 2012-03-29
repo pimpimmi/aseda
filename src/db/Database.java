@@ -78,14 +78,25 @@ public class Database {
 		return pr;
 	}
 
-	public boolean createPallet(int pNbr, String type, String fDate, String lDate) {
+	public void updateAmounts() {
+		String get = "select * from Materials";
 		try {
-			String get = "select mName, amount from Recipes where mName = ?";
 			PreparedStatement ps = conn.prepareStatement(get);
+			in.setAmounts(ps.executeQuery());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public boolean checkAmounts(String type) {
+		String get = "select mName, amount from Recipes where mName = ?";
+		PreparedStatement ps;
+		try {
+			ps = conn.prepareStatement(get);
 			ps.setString(1, type);
 			ResultSet rs = ps.executeQuery();
-			ArrayList <String> ingredients = new ArrayList<String>();
-			ArrayList <Integer> quantities = new ArrayList<Integer>();
+			ArrayList<String> ingredients = new ArrayList<String>();
+			ArrayList<Integer> quantities = new ArrayList<Integer>();
 			do {
 				ingredients.add(rs.getString(1));
 				quantities.add(rs.getInt(2));
@@ -93,25 +104,37 @@ public class Database {
 			
 			if (!in.checkAvailable(ingredients, quantities))
 				return false;
-			
-			String add = "insert into Pallets(pNbr, type, pDate, pTime, blocked) values (?, ?, ?, ?, ?, ?)";
-			ps = conn.prepareStatement(add);
 
-			dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-			timeFormat = new SimpleDateFormat("HH:mm");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return true;
+	}
 
-			Date date = new Date();
-			Calendar cal = Calendar.getInstance();
-			String currentTime = timeFormat.format(cal.getTime());
-			String currentDate = dateFormat.format(date);
+	public boolean createPallet(int pNbr, String type, String fDate,
+			String lDate) {
+		try {
+			updateAmounts();
+			if (checkAmounts(type)) {
+				String add = "insert into Pallets(pNbr, type, pDate, pTime, blocked) values (?, ?, ?, ?, ?, ?)";
+				PreparedStatement ps = conn.prepareStatement(add);
 
-			ps.setLong(1, 0);
-			ps.setString(2, type);
-			ps.setString(3, currentDate);
-			ps.setString(4, currentTime);
-			ps.setLong(5, 0);
-			ps.executeUpdate();
-			return true;
+				dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				timeFormat = new SimpleDateFormat("HH:mm");
+
+				Date date = new Date();
+				Calendar cal = Calendar.getInstance();
+				String currentTime = timeFormat.format(cal.getTime());
+				String currentDate = dateFormat.format(date);
+
+				ps.setLong(1, 0);
+				ps.setString(2, type);
+				ps.setString(3, currentDate);
+				ps.setString(4, currentTime);
+				ps.setLong(5, 0);
+				ps.executeUpdate();
+				return true;
+			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
