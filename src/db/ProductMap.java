@@ -25,6 +25,7 @@ public class ProductMap {
 		return prod.get(product);
 	}
 
+
 	public void populate(ResultSet info) {
 		try {
 			info.first();
