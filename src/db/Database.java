@@ -75,8 +75,8 @@ public class Database {
 		return conn != null;
 	}
 
-	public ProductMap searchResult(Object[] criteria) {
-		return pr;
+	public PalletMap searchResult(Object[] criteria) {
+		return pa;
 	}
 
 	public void updateAmounts() {
@@ -113,10 +113,9 @@ public class Database {
 	}
 
 	public boolean subtractAmounts(String type) {
-		String set = "update Materials set amountAvail -= amt where " + 
-				"mName in (Select pName, mName, amount, amountAvail from " +
-				"select Materials natural join Recipes where mName = ?)" +
-				"where amt = Recipes.amount ";
+		String set = "update M set amountAvail -= amount " + 
+				"from Materials as M natural join Recipes " +
+				"where pName = ?";
 		PreparedStatement ps;
 		try {
 			ps = conn.prepareStatement(set);
@@ -132,7 +131,7 @@ public class Database {
 		try {
 			updateAmounts();
 			if (checkAmounts(type)) {
-				String add = "insert into Pallets(pNbr, type, pDate, pTime, blocked) values (?, ?, ?, ?, ?, ?)";
+				String add = "insert into Pallets(pNbr, pName, pDate, pTime, blocked) values (?, ?, ?, ?, ?)";
 				PreparedStatement ps = conn.prepareStatement(add);
 
 				dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -186,8 +185,8 @@ public class Database {
 		return pr.getProduct(product);
 	}
 
-	public void createProduct(String product, int amount) {
-
-	}
+//	public void createProduct(String product, int amount) {
+//		
+//	}
 
 }

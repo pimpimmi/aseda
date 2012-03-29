@@ -3,25 +3,24 @@ package db;
 public class Pallet {
 	public static final int UNBLOCKED = 0;
 	private static final int BLOCKED = 1;
-	private int id;
+	private int pNbr;
 	private String type, pDate, pTime, fDate, lDate;
-	private boolean blocked;
+	private int blocked;
 
-	public Pallet(int id, String type, String pDate, String pTime,
-			String fDate, String lDate) {
-		this.id = id;
-		this.type = type;
+	public Pallet(int pNbr, String pName, String pDate, String pTime) {
+		this.pNbr = pNbr;
+		this.type = pName;
 		this.pDate = pDate;
 		this.pTime = pTime;
-		blocked = false;
+		blocked = UNBLOCKED;
 
 	}
 
 	public boolean getBlocked() {
-		return blocked;
+		return 1==blocked;
 	}
 
-	public void setBlocked(boolean mode) {
+	public void setBlocked(int mode) {
 		blocked = mode;
 	}
 

@@ -10,9 +10,8 @@ public class PalletMap {
 	}
 
 
-	public void add(int pNbr, String type, String pDate, String pTime,
-			String fDate, String lDate) {
-		 palls.put(pNbr, new Pallet(pNbr, type, pDate, pTime, fDate, lDate));
+	public void add(int pNbr, String type, String pDate, String pTime) {
+		 palls.put(pNbr, new Pallet(pNbr, type, pDate, pTime));
 	}
 
 	public void remove(int id) {
@@ -22,8 +21,8 @@ public class PalletMap {
 
 
 	public boolean block(int id) {
-		if (palls.get(id).getBlocked() == false) {
-			palls.get(id).setBlocked(true);
+		if (palls.get(id).getBlocked() == true) {
+			palls.get(id).setBlocked(1);
 			return true;
 		} else {
 			return false;
@@ -32,7 +31,7 @@ public class PalletMap {
 
 	public boolean unBlock(int id) {
 		if (palls.get(id).getBlocked() == true) {
-			palls.get(id).setBlocked(false);
+			palls.get(id).setBlocked(1);
 			return true;
 		} else {
 			return false;
