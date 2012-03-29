@@ -18,10 +18,10 @@ public class Database {
 	private DateFormat dateFormat;
 	private DateFormat timeFormat;
 
-	public Database() {
+	public Database(PalletMap pa, ProductMap pr) {
 		conn = null;
-		pr = new ProductMap(this);
-		pa = new PalletMap(this);
+		this.pr = pr;
+		this.pa = pa;
 
 		// for (int i = 0; i < 10; i++) {
 		// Object[] o = new Object[5];
@@ -50,7 +50,7 @@ public class Database {
 		// pa.put("Cookie" + String.valueOf(i), p);
 		//
 		// }
-		String pop = "select * from Products";
+		String pop = "select * from Recipes";
 		
 		try {
 			PreparedStatement ps = conn.prepareStatement(pop);

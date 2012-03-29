@@ -1,13 +1,11 @@
 package db;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 
 public class PalletMap {
 	private HashMap<Integer, Pallet> palls;
 
-	public PalletMap(Database db) {
+	public PalletMap() {
 		palls = new HashMap<Integer, Pallet>();
 	}
 
