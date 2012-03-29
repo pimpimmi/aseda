@@ -143,11 +143,11 @@ public class Database {
 				String currentTime = timeFormat.format(cal.getTime());
 				String currentDate = dateFormat.format(date);
 
-				ps.setLong(1, 0);
+				ps.setInt(1, 0);
 				ps.setString(2, type);
 				ps.setString(3, currentDate);
 				ps.setString(4, currentTime);
-				ps.setLong(5, Pallet.UNBLOCKED);
+				ps.setInt(5, Pallet.UNBLOCKED);
 				ps.executeUpdate();
 
 				subtractAmounts(type);
