@@ -1,27 +1,26 @@
 package db;
 
 public class Pallet {
-	private int id, type, quantity;
-	private String customer, fDate, lDate;
+	private int id;
+	private String type, pDate, pTime, fDate, lDate;
 	private boolean blocked;
 
-	public Pallet(int id, int type, int quantity, String customer,
-			String fDate, String lDate) {
+	public Pallet(int id, String type, String pDate, String pTime, String fDate, String lDate) {
 		this.id = id;
 		this.type = type;
-		this.quantity = quantity;
-		this.customer = customer;
+		this.pDate = pDate;
+		this.pTime = pTime;
 		this.fDate = fDate;
 		this.lDate = lDate;
 		blocked = false;
 
 	}
-	
-	public boolean getBlocked(){
+
+	public boolean getBlocked() {
 		return blocked;
 	}
-	
-	public void setBlocked(boolean mode){
+
+	public void setBlocked(boolean mode) {
 		blocked = mode;
 	}
 

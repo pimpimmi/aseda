@@ -9,7 +9,7 @@ import java.util.Set;
 public class ProductMap {
 	private HashMap<String, Product> prod;
 
-	public ProductMap(Database db) {
+	public ProductMap() {
 		prod = new HashMap<String, Product>();
 	}
 

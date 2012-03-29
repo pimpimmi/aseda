@@ -14,44 +14,17 @@ public class Database {
 	private Connection conn;
 	private PalletMap pa;
 	private ProductMap pr;
-	
+
 	private DateFormat dateFormat;
 	private DateFormat timeFormat;
 
-	public Database() {
+	public Database(PalletMap pall, ProductMap prod) {
 		conn = null;
-		pr = new ProductMap(this);
-		pa = new PalletMap(this);
+		pa = pall;
+		pr = prod;
 
-		// for (int i = 0; i < 10; i++) {
-		// Object[] o = new Object[5];
-		// o[0] = i;
-		// o[1] = "2001-01-01";
-		// o[2] = "23:23";
-		// o[3] = "yes"; // blocked?
-		// if (Math.random() > 0.5)
-		// o[4] = false;
-		// else
-		// o[4] = true; // delivered?
-		// pr[i] = o;
-		//
-		// Object[][] p = new Object[3][3];
-		//
-		// p[0][0] = "Ingr1";
-		// p[0][1] = 100;
-		// p[0][2] = 10;
-		// p[1][0] = "Ingr2" + String.valueOf(i + 1);
-		// p[1][1] = 100;
-		// p[1][2] = 7;
-		// p[2][0] = "Ingr3" + String.valueOf(i + 1);
-		// p[2][1] = 100;
-		// p[2][2] = 37;
-		//
-		// pa.put("Cookie" + String.valueOf(i), p);
-		//
-		// }
 		String pop = "select * from Recipes";
-		
+
 		try {
 			PreparedStatement ps = conn.prepareStatement(pop);
 			pr.populate(ps.executeQuery());
@@ -102,30 +75,31 @@ public class Database {
 		return pr;
 	}
 
-	public boolean createPallet(int pNbr, String type, String fDate, String lDate) {
+	public int createPallet(int pNbr, String type, String fDate, String lDate) {
 		try {
 			String add = "insert into Pallets(pNbr, type, pDate, pTime, blocked) values (?, ?, ?, ?, ?, ?)";
 			PreparedStatement ps = conn.prepareStatement(add);
-			
-			dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-	    	timeFormat = new SimpleDateFormat("HH:mm");
 
-	    	Date date = new Date();
-	    	Calendar cal = Calendar.getInstance();
-	    	String currentTime = timeFormat.format(cal.getTime());
-	    	String currentDate = dateFormat.format(date);
-	    	
+			dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			timeFormat = new SimpleDateFormat("HH:mm");
+
+			Date date = new Date();
+			Calendar cal = Calendar.getInstance();
+			String currentTime = timeFormat.format(cal.getTime());
+			String currentDate = dateFormat.format(date);
+
 			ps.setLong(1, pNbr);
 			ps.setString(2, type);
 			ps.setString(3, currentDate);
-			ps.setString(4, currentTime);	
+			ps.setString(4, currentTime);
 			ps.setLong(5, 0);
 			ps.executeUpdate();
+			pa.add(pNbr, type, currentDate, currentTime, null, null);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return false;
+		return pNbr;
 
 	}
 

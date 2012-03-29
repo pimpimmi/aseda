@@ -1,7 +1,6 @@
 package view;
+
 import db.*;
-
-
 
 public class Main {
 
@@ -9,9 +8,9 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Database db = new Database();
-		PalletMap pa = new PalletMap(db);
-		ProductMap pr = new ProductMap(db);
+		PalletMap pa = new PalletMap();
+		ProductMap pr = new ProductMap();
+		Database db = new Database(pa, pr);
 		new PalletView(db, pa, pr);
 	}
 
