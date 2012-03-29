@@ -1,10 +1,12 @@
 package db;
 
+import java.security.spec.PSSParameterSpec;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -75,8 +77,53 @@ public class Database {
 		return conn != null;
 	}
 
-	public PalletMap searchResult(Object[] criteria) {
-		return pa;
+	@SuppressWarnings("deprecation")
+	public void searchResult(String[] criteria) {
+		ArrayList<String> fields = new ArrayList<String>();
+		String get = "select * from Pallets";
+		if (!(criteria[0] == "" && criteria[1] == "" && criteria[2] == ""
+				&& criteria[3] == "" && criteria[4] == "" && criteria[5] == ""))
+			get += " where";
+		if (criteria[0] != "") {
+			get += " pNbr = ? and";
+			fields.add("pNbr");
+		}
+		if (criteria[1] != "") {
+			get += "pName = ? and";
+			fields.add("pName");
+		}
+		if (criteria[2] != "") {
+			get += "pDate > ?";
+			fields.add("fpDate");
+		}
+		if (criteria[3] != "") {
+			get += "pTime > ?";
+			fields.add("fpTime");
+		}
+		if (criteria[4] != "") {
+			get += "pDate < ?";
+			fields.add("tpDate");
+		}
+		if (criteria[5] != "") {
+			get += "pTime < ?";
+			fields.add("tpTime");
+		}
+		get = get.substring(0, get.length()-3);
+		try {
+			PreparedStatement ps = conn.prepareStatement(get);
+			for (int i = 0; i < fields.size(); i++) {
+				String s = fields.remove(0);
+				if (s == "pNbr" || s == "pName")
+					ps.setString(i, s);
+				if (s == "fpDate" || s == "tpDate")
+					ps.setDate(i, new java.sql.Date(Date.parse(s)));
+				if (s == "fpTime" || s == "tpTime")
+					ps.setTime(i, new java.sql.Time(Time.parse(s)));
+			}
+			pa.populate(ps.executeQuery());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void updateAmounts() {
@@ -113,9 +160,9 @@ public class Database {
 	}
 
 	public boolean subtractAmounts(String type) {
-		String set = "update M set amountAvail -= amount " + 
-				"from Materials as M natural join Recipes " +
-				"where pName = ?";
+		String set = "update M set amountAvail -= amount "
+				+ "from Materials as M natural join Recipes "
+				+ "where pName = ?";
 		PreparedStatement ps;
 		try {
 			ps = conn.prepareStatement(set);
@@ -173,7 +220,7 @@ public class Database {
 		if (Math.random() > 0.9)
 			return false;
 		else {
-			return pa.unBlock(id);
+			return pa.unblock(id);
 		}
 	}
 
@@ -185,8 +232,8 @@ public class Database {
 		return pr.getProduct(product);
 	}
 
-//	public void createProduct(String product, int amount) {
-//		
-//	}
+	// public void createProduct(String product, int amount) {
+	//
+	// }
 
 }

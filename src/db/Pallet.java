@@ -7,12 +7,12 @@ public class Pallet {
 	private String type, pDate, pTime, fDate, lDate;
 	private int blocked;
 
-	public Pallet(int pNbr, String pName, String pDate, String pTime) {
+	public Pallet(int pNbr, String pName, String pDate, String pTime, int blocked) {
 		this.pNbr = pNbr;
 		this.type = pName;
 		this.pDate = pDate;
 		this.pTime = pTime;
-		blocked = UNBLOCKED;
+		this.blocked = blocked;
 
 	}
 
