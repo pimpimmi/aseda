@@ -14,8 +14,8 @@ public class Ingredients {
 
 	public void setAmounts(ResultSet amounts) {
 		try {
+			amounts.first();
 			do {
-				amounts.first();
 				ingredients.put(amounts.getString(1), amounts.getInt(2));
 			} while (amounts.next());
 		} catch (SQLException e) {
