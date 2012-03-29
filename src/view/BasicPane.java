@@ -33,8 +33,12 @@ public class BasicPane extends JPanel {
      * @param db The database object.
      */
     public BasicPane() {
-        messageLabel = new JLabel("      ");
-                
+        
+    }
+    
+    public void setUpPane(){
+    	messageLabel = new JLabel("      ");
+        
         setLayout(new BorderLayout());
                 
         JComponent leftPanel = createLeftPanel();
