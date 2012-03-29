@@ -50,7 +50,7 @@ public class Database {
 		// pa.put("Cookie" + String.valueOf(i), p);
 		//
 		// }
-		String pop = "select * from Products";
+		String pop = "select * from Recipes";
 		
 		try {
 			PreparedStatement ps = conn.prepareStatement(pop);
