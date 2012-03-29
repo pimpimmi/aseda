@@ -27,7 +27,7 @@ public class Database {
 		pr = prod;
 		in = ingr;
 		updateAmounts();
-		
+
 		String pop = "select * from Recipes";
 		try {
 			PreparedStatement ps = conn.prepareStatement(pop);
@@ -102,7 +102,7 @@ public class Database {
 				ingredients.add(rs.getString(1));
 				quantities.add(rs.getInt(2));
 			} while (rs.next());
-			
+
 			if (!in.checkAvailable(ingredients, quantities))
 				return false;
 
@@ -112,8 +112,23 @@ public class Database {
 		return true;
 	}
 
-	public boolean createPallet(int pNbr, String type, String fDate,
-			String lDate) {
+	public boolean subtractAmounts(String type) {
+		String set = "update Materials set amountAvail -= amt where " + 
+				"mName in (Select pName, mName, amount, amountAvail from " +
+				"select Materials natural join Recipes where mName = ?)" +
+				"where amt = Recipes.amount ";
+		PreparedStatement ps;
+		try {
+			ps = conn.prepareStatement(set);
+			ps.setString(1, type);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return true;
+	}
+
+	public boolean createPallet(String type) {
 		try {
 			updateAmounts();
 			if (checkAmounts(type)) {
@@ -132,8 +147,11 @@ public class Database {
 				ps.setString(2, type);
 				ps.setString(3, currentDate);
 				ps.setString(4, currentTime);
-				ps.setLong(5, 0);
+				ps.setLong(5, Pallet.UNBLOCKED);
 				ps.executeUpdate();
+
+				subtractAmounts(type);
+
 				return true;
 			}
 		} catch (SQLException e) {
