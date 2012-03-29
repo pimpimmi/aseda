@@ -24,7 +24,6 @@ public class Database {
 		pr = prod;
 
 		String pop = "select * from Recipes";
-
 		try {
 			PreparedStatement ps = conn.prepareStatement(pop);
 			pr.populate(ps.executeQuery());
