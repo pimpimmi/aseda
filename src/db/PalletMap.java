@@ -1,25 +1,20 @@
 package db;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class PalletMap {
-	private HashMap<Integer, Pallet> palls;
+	public ArrayList<Pallet> palls;
 
 	public PalletMap() {
-		palls = new HashMap<Integer, Pallet>();
+		palls = new ArrayList<Pallet>();
 	}
 
 
 	public void add(int pNbr, String type, String pDate, String pTime,
 			String fDate, String lDate) {
-		 palls.put(pNbr, new Pallet(pNbr, type, pDate, pTime, fDate, lDate));
+		 palls.add(new Pallet(pNbr, type, pDate, pTime, fDate, lDate));
 	}
-
-	public void remove(int id) {
-		palls.remove(id);
-	}
-
-
 
 	public boolean block(int id) {
 		if (palls.get(id).getBlocked() == false) {

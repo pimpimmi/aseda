@@ -112,7 +112,7 @@ public class ProductionPane extends BasicPane{
 				quantity = 1000;
 			}
 			for(int i = 0; i < ingrTableModel.getRowCount(); i++){
-				int newValue = (Integer) ingrTableModel.getValueAt(i, 1);
+				long newValue = (Long) ingrTableModel.getValueAt(i, 1);
 				newValue *= quantity;
 				newValue /= oldQuantity;
 				ingrTableModel.setValueAt(newValue , i, 1);
@@ -131,7 +131,6 @@ public class ProductionPane extends BasicPane{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			String value = (String) list.getSelectedValue();
 			for(int i = 0; i < oldQuantity; i++)
 				db.createPallet((String) list.getSelectedValue());
 		}
@@ -159,8 +158,8 @@ public class ProductionPane extends BasicPane{
 			for(int i = 0; i < ingredientNames.size(); i++){
 				Object[] row = new Object[3];
 				String name = ingredientNames.get(i);
-				int needed = neededAmount.get(i)*quantity;
-				int available = in.getAmount(name);
+				long needed = neededAmount.get(i)*quantity*54;
+				long available = in.getAmount(name);
 				row[0] = name;
 				row[1] = needed;
 				row[2] = available;

@@ -132,7 +132,7 @@ public class Database {
 		try {
 			updateAmounts();
 			if (checkAmounts(type)) {
-				String add = "insert into Pallets(pNbr, type, pDate, pTime, blocked) values (?, ?, ?, ?, ?, ?)";
+				String add = "insert into Pallets(pNbr, type, pDate, pTime, blocked) values (?, ?, ?, ?, ?)";
 				PreparedStatement ps = conn.prepareStatement(add);
 
 				dateFormat = new SimpleDateFormat("yyyy-MM-dd");

@@ -25,6 +25,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import db.Database;
+import db.Pallet;
 import db.PalletMap;
 
 
@@ -32,10 +33,13 @@ import db.PalletMap;
 public class SearchBlockPane extends BasicPane{
 
 	
-	private static int SEARCH_ID = 0, SEARCH_FROM_DATE = 1, SEARCH_FROM_TIME = 2,
-			SEARCH_TO_DATE = 3, SEARCH_TO_TIME = 4, SEARCH_SORT = 5, SEARCH_SIZE = 6;
+	private static int SEARCH_ID = 0, SEARCH_SORT = 1, SEARCH_FROM_DATE = 2, SEARCH_FROM_TIME = 3,
+			SEARCH_TO_DATE = 4, SEARCH_TO_TIME = 5, SEARCH_SIZE = 6;
 	
+	PalletMap pa;
+	Database db;
 	
+	DefaultTableModel tableModel;
 	
 	private JTextField[] searchFields;
 	JButton[][] searchButtons;
@@ -44,8 +48,10 @@ public class SearchBlockPane extends BasicPane{
 	DateFormat dateFormat;
 	DateFormat timeFormat;
 	
-	public SearchBlockPane(PalletMap pa) {
-		super();
+	public SearchBlockPane(PalletMap pa, Database db) {
+		this.pa = pa;
+		this.db = db;
+		setUpPane();
 	}
 
 	
@@ -99,7 +105,7 @@ public class SearchBlockPane extends BasicPane{
 
 		searchButtons = new JButton[2][2];
 		searchButtons[0][0] = new JButton("Search");
-		searchButtons[0][1] = new JButton("clear");
+		searchButtons[0][1] = new JButton("Clear");
 //		JPanel p2 = new JPanel();
 //		p2.add(searchButtons[0]);
 //		p2.add(searchButtons[1]);
@@ -119,8 +125,9 @@ public class SearchBlockPane extends BasicPane{
 	}
 	
 	public JComponent createTopPanel() {
+		tableModel = new DefaultTableModel( null, new String [] {"Pallet ID","Product", "Date", "Time","Blocked","Delivered"} );
 		table = new JTable();
-		table.setModel(new DefaultTableModel( null, new String [] {"Pallet ID","Product", "Date", "Time","Blocked","Delivered"} ));
+		table.setModel(tableModel);
 		JScrollPane simulationScrollPane = new JScrollPane();
 		for(int i = 0; i < table.getColumnCount(); i++)
 			table.getColumnModel().getColumn(i).setResizable(false);
@@ -132,10 +139,7 @@ public class SearchBlockPane extends BasicPane{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if(((JButton) arg0.getSource()).getText().equals("Block"))
-				messageLabel.setText("block");
-			else
-				messageLabel.setText("unblock");
+			
 		}
 		
 	}
@@ -144,10 +148,40 @@ public class SearchBlockPane extends BasicPane{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if(((JButton) arg0.getSource()).getText().equals("Block"))
-				messageLabel.setText("block");
+			String s = ((JButton) arg0.getSource()).getText();
+			if(s.equals("Search"))
+				searchForPallets();
+			else if(s.equals("Clear"))
+				clearSearch();
+			else if(s.equals("Block"))
+				blockPallet();
 			else
-				messageLabel.setText("unblock");
+				unblockPallet();
+		}
+
+		private void unblockPallet() {
+			
+		}
+
+		private void blockPallet() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		private void clearSearch() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		private void searchForPallets() {
+			String[] s = new String[6];
+			for(int i = 0; i < 6; i++)
+				s[i] = searchFields[i].getText();
+			db.searchResult(s);
+			
+			for(Pallet p : pa.palls){
+				
+			}
 		}
 		
 	}

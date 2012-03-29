@@ -42,7 +42,7 @@ public class PalletView {
 		tabbedPane.addTab("Production", null, productionPane,
 				"Produce pallets");
 
-		SearchBlockPane bookingPane = new SearchBlockPane(pa);
+		SearchBlockPane bookingPane = new SearchBlockPane(pa, db);
 		tabbedPane.addTab("Search/Block", null, bookingPane, "Find and block pallets");
 
 		tabbedPane.setSelectedIndex(0);
