@@ -19,7 +19,7 @@ public class Database {
 	private DateFormat timeFormat;
 
 	public Database(PalletMap pall, ProductMap prod) {
-		conn = null;
+		openConnection("db69", "shamoona");
 		pa = pall;
 		pr = prod;
 
@@ -88,13 +88,13 @@ public class Database {
 			String currentTime = timeFormat.format(cal.getTime());
 			String currentDate = dateFormat.format(date);
 
-			ps.setLong(1, pNbr);
+			ps.setLong(1, 0);
 			ps.setString(2, type);
 			ps.setString(3, currentDate);
 			ps.setString(4, currentTime);
 			ps.setLong(5, 0);
 			ps.executeUpdate();
-			pa.add(pNbr, type, currentDate, currentTime, null, null);
+//			pa.add(pNbr, type, currentDate, currentTime, null, null);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
