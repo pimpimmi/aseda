@@ -3,9 +3,11 @@ package db;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -14,14 +16,16 @@ public class Database {
 	private Connection conn;
 	private PalletMap pa;
 	private ProductMap pr;
+	private Ingredients in;
 
 	private DateFormat dateFormat;
 	private DateFormat timeFormat;
 
-	public Database(PalletMap pall, ProductMap prod) {
+	public Database(PalletMap pall, ProductMap prod, Ingredients ingr) {
 		openConnection("db69", "shamoona");
 		pa = pall;
 		pr = prod;
+		in = ingr;
 
 		String pop = "select * from Recipes";
 		try {
@@ -76,9 +80,22 @@ public class Database {
 
 	public boolean createPallet(int pNbr, String type, String fDate, String lDate) {
 		try {
-			//if ()
+			String get = "select mName, amount from Recipes where mName = ?";
+			PreparedStatement ps = conn.prepareStatement(get);
+			ps.setString(1, type);
+			ResultSet rs = ps.executeQuery();
+			ArrayList <String> ingredients = new ArrayList<String>();
+			ArrayList <Integer> quantities = new ArrayList<Integer>();
+			do {
+				ingredients.add(rs.getString(1));
+				quantities.add(rs.getInt(2));
+			} while (rs.next());
+			
+			if (!in.checkAvailable(ingredients, quantities))
+				return false;
+			
 			String add = "insert into Pallets(pNbr, type, pDate, pTime, blocked) values (?, ?, ?, ?, ?, ?)";
-			PreparedStatement ps = conn.prepareStatement(add);
+			ps = conn.prepareStatement(add);
 
 			dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 			timeFormat = new SimpleDateFormat("HH:mm");

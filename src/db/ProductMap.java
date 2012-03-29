@@ -41,7 +41,6 @@ public class ProductMap {
 					ingredients = new ArrayList<String>();
 					quantities = new ArrayList<Integer>();
 				}
-
 				ingredients.add(info.getString(2));
 				quantities.add(info.getInt(3));
 			} while (info.next());
