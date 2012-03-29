@@ -22,13 +22,13 @@ public class ProductMap {
 	}
 
 
-	public void populate(ResultSet productSet) {
-		for (int i = 0; i < productSet.; i++) {
-			
-		}
-		productSet.getArray(productSet.)
-		
-	}
+//	public void populate(ResultSet productSet) {
+//		for (int i = 0; i < productSet.; i++) {
+//			
+//		}
+//		productSet.getArray(productSet.)
+//		
+//	}
  
 
 	
