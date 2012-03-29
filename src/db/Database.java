@@ -1,13 +1,12 @@
 package db;
 
-import java.security.spec.PSSParameterSpec;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -77,7 +76,6 @@ public class Database {
 		return conn != null;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void searchResult(String[] criteria) {
 		ArrayList<String> fields = new ArrayList<String>();
 		String get = "select * from Pallets";
@@ -115,10 +113,14 @@ public class Database {
 				String s = fields.remove(0);
 				if (s == "pNbr" || s == "pName")
 					ps.setString(i, s);
-				if (s == "fpDate" || s == "tpDate")
-					ps.setDate(i, new java.sql.Date(Date.parse(s)));
-				if (s == "fpTime" || s == "tpTime")
-					ps.setTime(i, new java.sql.Time(Time.parse(s)));
+					try {
+						if (s == "fpDate" || s == "tpDate")
+						ps.setDate(i, (java.sql.Date) dateFormat.parse(s));
+						if (s == "fpTime" || s == "tpTime")
+							ps.setTime(i, (java.sql.Time) timeFormat.parse(s));
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
 			}
 			pa.populate(ps.executeQuery());
 		} catch (SQLException e) {
