@@ -124,6 +124,7 @@ public class SearchBlockPane extends BasicPane{
 		return p;
 	}
 	
+	
 	public JComponent createTopPanel() {
 		tableModel = new DefaultTableModel( null, new String [] {"Pallet ID","Product", "Date", "Time","Blocked","Delivered"} );
 		table = new JTable();
@@ -169,8 +170,8 @@ public class SearchBlockPane extends BasicPane{
 		}
 
 		private void clearSearch() {
-			// TODO Auto-generated method stub
-			
+			for(int i = 0; i < searchFields.length; i++)
+				searchFields[i].setText("");
 		}
 
 		private void searchForPallets() {
@@ -178,9 +179,10 @@ public class SearchBlockPane extends BasicPane{
 			for(int i = 0; i < 6; i++)
 				s[i] = searchFields[i].getText();
 			db.searchResult(s);
-			
+			for(int i = 0; i < tableModel.getRowCount(); i++)
+				tableModel.removeRow(0);
 			for(Pallet p : pa.palls){
-				
+				tableModel.addRow(p.getStrings());
 			}
 		}
 		
