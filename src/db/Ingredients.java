@@ -22,6 +22,10 @@ public class Ingredients {
 			e.printStackTrace();
 		}
 	}
+	
+	public int getAmount(String mName){
+		return ingredients.get(mName);
+	}
 
 	public boolean checkAvailable(ArrayList<String> ing, ArrayList<Integer> amn) {
 		for (int i = 0; i < ing.size(); i++) {
