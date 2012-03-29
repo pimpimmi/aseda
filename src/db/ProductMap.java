@@ -16,15 +16,14 @@ public class ProductMap {
 	public Set<String> keySet() {
 		return prod.keySet();
 	}
-	
-	public void addProduct(String name, Product product){
+
+	public void addProduct(String name, Product product) {
 		prod.put(name, product);
 	}
 
 	public Product getProduct(String product) {
 		return prod.get(product);
 	}
-
 
 	public void populate(ResultSet info) {
 		try {
@@ -33,18 +32,19 @@ public class ProductMap {
 			ArrayList<String> ingredients = new ArrayList<String>();
 			ArrayList<Integer> quantities = new ArrayList<Integer>();
 			do {
-				if (currProd != info.getString(0) || currProd == "") {
-					if (currProd != "")
-						addProduct(currProd, new Product(currProd, ingredients, quantities));
-					currProd = info.getString(0);
+				if (!currProd.equals(info.getString(1))) {
+					if (currProd != "") {
+						addProduct(currProd, new Product(currProd, ingredients,
+								quantities));
+					}
+					currProd = info.getString(1);
 					ingredients = new ArrayList<String>();
 					quantities = new ArrayList<Integer>();
 				}
 
-				ingredients.add(info.getString(1));
-				quantities.add(info.getInt(2));
+				ingredients.add(info.getString(2));
+				quantities.add(info.getInt(3));
 			} while (info.next());
-
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

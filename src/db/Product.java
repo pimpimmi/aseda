@@ -13,5 +13,16 @@ public class Product {
 		this.ingredients = ingredients;
 		this.quantities = quantities;
 	}
+	
+	public String getName(){
+		return name;
+	}
+	
+	public ArrayList<String> getIngredients(){
+		return ingredients;
+	}
 
+	public ArrayList<Integer> getQuantities(){
+		return quantities;
+	}
 }
