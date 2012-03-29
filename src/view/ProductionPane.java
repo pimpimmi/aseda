@@ -43,6 +43,7 @@ public class ProductionPane extends BasicPane{
 	public ProductionPane(ProductMap pr, Ingredients in, Database db) {
 		this.in = in;
 		this.pr = pr;
+		this.db = db;
 		oldQuantity = 1;
 		setUpPane();
 	}
@@ -130,6 +131,7 @@ public class ProductionPane extends BasicPane{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
+			String value = (String) list.getSelectedValue();
 			for(int i = 0; i < oldQuantity; i++)
 				db.createPallet((String) list.getSelectedValue());
 		}
