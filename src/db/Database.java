@@ -74,8 +74,9 @@ public class Database {
 		return pr;
 	}
 
-	public int createPallet(int pNbr, String type, String fDate, String lDate) {
+	public boolean createPallet(int pNbr, String type, String fDate, String lDate) {
 		try {
+			//if ()
 			String add = "insert into Pallets(pNbr, type, pDate, pTime, blocked) values (?, ?, ?, ?, ?, ?)";
 			PreparedStatement ps = conn.prepareStatement(add);
 
@@ -93,12 +94,12 @@ public class Database {
 			ps.setString(4, currentTime);
 			ps.setLong(5, 0);
 			ps.executeUpdate();
-//			pa.add(pNbr, type, currentDate, currentTime, null, null);
+			return true;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return pNbr;
+		return false;
 
 	}
 
