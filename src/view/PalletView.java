@@ -34,11 +34,11 @@ public class PalletView {
 	 */
 
 
-	public PalletView(Database da, PalletMap pa, ProductMap pr, Ingredients in) {
+	public PalletView(Database db, PalletMap pa, ProductMap pr, Ingredients in) {
 		JFrame frame = new JFrame("Krusty Pallet Program");
 		tabbedPane = new JTabbedPane();
 
-		ProductionPane productionPane = new ProductionPane(pr, in);
+		ProductionPane productionPane = new ProductionPane(pr, in, db);
 		tabbedPane.addTab("Production", null, productionPane,
 				"Produce pallets");
 
@@ -55,7 +55,6 @@ public class PalletView {
 		frame.setSize(700,400);
 		frame.setVisible(true);
 		
-		da.openConnection("db69", "shamoona");
 
 	}
 
