@@ -3,6 +3,9 @@ package view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.util.Set;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -14,6 +17,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import db.ProductMap;
@@ -21,6 +26,7 @@ import db.ProductMap;
 
 public class ProductionPane extends BasicPane{
 	
+	ProductMap pr;
 	DefaultListModel listModel;
 	JTextField quantity;
 	JTable table;
@@ -28,6 +34,7 @@ public class ProductionPane extends BasicPane{
 
 	public ProductionPane(ProductMap pr) {
 		super();
+		this.pr = pr;
 	}
 	
 	
@@ -37,6 +44,13 @@ public class ProductionPane extends BasicPane{
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setPrototypeCellValue("123456789012");
 		list.setFixedCellWidth(200);
+// TODO	Set<String> productNames = pr.keySet();
+//		for(String s : productNames)
+//			listModel.addElement(s);
+		listModel.addElement("hej");
+		listModel.addElement("hej2");
+		
+		list.addListSelectionListener(new ListFocusListener());
 		return new JScrollPane(list);
 		
 		
@@ -75,14 +89,18 @@ public class ProductionPane extends BasicPane{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			listModel.addElement("Pall " + id);
-			id++;
-		
+			
 		}
 		
 	}
 	
+	class ListFocusListener implements ListSelectionListener{
 
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			
+		}		
+	}
 	
 
 }

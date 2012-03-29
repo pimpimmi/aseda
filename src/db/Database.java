@@ -19,12 +19,11 @@ public class Database {
 	private DateFormat timeFormat;
 
 	public Database(PalletMap pall, ProductMap prod) {
-		conn = null;
+		openConnection("db69", "shamoona");
 		pa = pall;
 		pr = prod;
 
 		String pop = "select * from Recipes";
-
 		try {
 			PreparedStatement ps = conn.prepareStatement(pop);
 			pr.populate(ps.executeQuery());
