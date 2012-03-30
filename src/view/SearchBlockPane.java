@@ -174,7 +174,6 @@ public class SearchBlockPane extends BasicPane{
 		}
 
 		private void searchForPallets() {
-			tableModel.setColumnCount(6);
 			String[] s = new String[6];
 			for(int i = 0; i < 6; i++)
 				s[i] = searchFields[i].getText();
@@ -185,9 +184,7 @@ public class SearchBlockPane extends BasicPane{
 				tableModel.addRow(p.getStrings());
 			}
 			if (pa.palls.isEmpty()){
-				String[] s2 = {"No matching Pallets"};
-				tableModel.setColumnCount(1);
-				tableModel.addRow(s2);
+				System.out.println("No matching pallets!");
 			}
 		}
 		

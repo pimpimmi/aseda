@@ -80,7 +80,7 @@ public class Database {
 
 	public void searchResult(String[] criteria) {
 		ArrayList<String> fields = new ArrayList<String>();
-		String get = "select * from Pallets";
+		String get = "select pNbr, pName, pDate, pTime, blocked, delivered from Pallets";
 		boolean crit = false;
 		if (!(criteria[0].equals("") && criteria[1].equals("")
 				&& criteria[2].equals("") && criteria[3].equals("")
@@ -227,7 +227,7 @@ public class Database {
 				ps.setString(2, currentDate);
 				ps.setString(3, currentTime);
 				ps.setBoolean(4, false);
-				ps.setBoolean(5, false);
+				ps.setDate(5, null);
 				ps.executeUpdate();
 
 				subtractAmounts(type);

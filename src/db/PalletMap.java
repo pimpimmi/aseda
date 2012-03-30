@@ -30,7 +30,7 @@ public class PalletMap {
 		try {
 			info.first();
 			if (info.next()) {
-				//TODO skippar den en?
+				info.first();
 				boolean blocked, delivered;
 				int pNbr;
 				String pName, pDate, pTime;
@@ -44,7 +44,7 @@ public class PalletMap {
 						delivered = false;
 					else
 						delivered = true;
-					palls.add(pNbr, new Pallet(pNbr, pName, pDate, pTime,
+					palls.add(new Pallet(pNbr, pName, pDate, pTime,
 							blocked, delivered));
 				} while (info.next());
 			}
