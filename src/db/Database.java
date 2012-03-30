@@ -79,48 +79,53 @@ public class Database {
 	public void searchResult(String[] criteria) {
 		ArrayList<String> fields = new ArrayList<String>();
 		String get = "select * from Pallets";
-		if (!(criteria[0] == "" && criteria[1] == "" && criteria[2] == ""
-				&& criteria[3] == "" && criteria[4] == "" && criteria[5] == ""))
+		boolean crit = false;
+		if (!(criteria[0].equals("") && criteria[1].equals("")
+				&& criteria[2].equals("") && criteria[3].equals("")
+				&& criteria[4].equals("") && criteria[5].equals(""))) {
 			get += " where";
-		if (criteria[0] != "") {
+			crit = true;
+		}
+		if (!criteria[0].equals("")) {
 			get += " pNbr = ? and";
 			fields.add("pNbr");
 		}
-		if (criteria[1] != "") {
-			get += "pName = ? and";
+		if (!criteria[1].equals("")) {
+			get += " pName = ? and";
 			fields.add("pName");
 		}
-		if (criteria[2] != "") {
-			get += "pDate > ?";
+		if (!criteria[2].equals("")) {
+			get += " pDate > ? and";
 			fields.add("fpDate");
 		}
-		if (criteria[3] != "") {
-			get += "pTime > ?";
+		if (!criteria[3].equals("")) {
+			get += " pTime > ? and";
 			fields.add("fpTime");
 		}
-		if (criteria[4] != "") {
-			get += "pDate < ?";
+		if (!criteria[4].equals("")) {
+			get += " pDate < ? and";
 			fields.add("tpDate");
 		}
-		if (criteria[5] != "") {
-			get += "pTime < ?";
+		if (!criteria[5].equals("")) {
+			get += " pTime < ? and";
 			fields.add("tpTime");
 		}
-		get = get.substring(0, get.length()-3);
+		if (crit)
+			get = get.substring(0, get.length() - 3);
 		try {
 			PreparedStatement ps = conn.prepareStatement(get);
-			for (int i = 0; i < fields.size(); i++) {
+			for (int i = 1; i <= fields.size(); i++) {
 				String s = fields.remove(0);
-				if (s == "pNbr" || s == "pName")
+				if (s.equals("pNbr") || s.equals("pName"))
 					ps.setString(i, s);
-					try {
-						if (s == "fpDate" || s == "tpDate")
+				try {
+					if (s.equals("fpDate") || s.equals("tpDate"))
 						ps.setDate(i, (java.sql.Date) dateFormat.parse(s));
-						if (s == "fpTime" || s == "tpTime")
-							ps.setTime(i, (java.sql.Time) timeFormat.parse(s));
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
+					if (s.equals("fpTime") || s.equals("tpTime"))
+						ps.setTime(i, (java.sql.Time) timeFormat.parse(s));
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
 			}
 			pa.populate(ps.executeQuery());
 		} catch (SQLException e) {
