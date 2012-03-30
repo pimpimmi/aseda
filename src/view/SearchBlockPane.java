@@ -165,8 +165,7 @@ public class SearchBlockPane extends BasicPane{
 		}
 
 		private void blockPallet() {
-			// TODO Auto-generated method stub
-			
+//			db.block(tableModel.)
 		}
 
 		private void clearSearch() {
