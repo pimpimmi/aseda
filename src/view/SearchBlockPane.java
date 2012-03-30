@@ -27,6 +27,11 @@ import db.PalletMap;
 public class SearchBlockPane extends BasicPane{
 
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private static int SEARCH_ID = 0, SEARCH_SORT = 1, SEARCH_FROM_DATE = 2, SEARCH_FROM_TIME = 3,
 			SEARCH_TO_DATE = 4, SEARCH_TO_TIME = 5, SEARCH_SIZE = 6;
 	
@@ -120,7 +125,7 @@ public class SearchBlockPane extends BasicPane{
 	
 	
 	public JComponent createTopPanel() {
-		tableModel = new DefaultTableModel( null, new String [] {"Pallet ID","Product", "Date", "Time","Blocked","Delivered"} );
+		tableModel = new DefaultTableModel( null, new String [] {"Pallet Number","Product", "Date", "Time","Blocked","Delivered"} );
 		table = new JTable();
 		table.setModel(tableModel);
 		JScrollPane simulationScrollPane = new JScrollPane();
@@ -169,6 +174,7 @@ public class SearchBlockPane extends BasicPane{
 		}
 
 		private void searchForPallets() {
+			tableModel.setColumnCount(6);
 			String[] s = new String[6];
 			for(int i = 0; i < 6; i++)
 				s[i] = searchFields[i].getText();
@@ -177,6 +183,11 @@ public class SearchBlockPane extends BasicPane{
 				tableModel.removeRow(0);
 			for(Pallet p : pa.palls){
 				tableModel.addRow(p.getStrings());
+			}
+			if (pa.palls.isEmpty()){
+				String[] s2 = {"No matching Pallets"};
+				tableModel.setColumnCount(1);
+				tableModel.addRow(s2);
 			}
 		}
 		

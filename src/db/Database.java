@@ -117,20 +117,28 @@ public class Database {
 		try {
 			PreparedStatement ps = conn.prepareStatement(get);
 			for (int i = 1; i <= fields.size(); i++) {
-				String s = fields.get(i-1);
+				String s = fields.get(i - 1);
 				if (s.equals("pNbr"))
 					ps.setString(i, criteria[0]);
 				if (s.equals("pName"))
 					ps.setString(i, criteria[1]);
 				try {
 					if (s.equals("fpDate"))
-						ps.setDate(i, new java.sql.Date(dateFormat.parse(criteria[2]).getTime()));
+						ps.setDate(i,
+								new java.sql.Date(dateFormat.parse(criteria[2])
+										.getTime()));
 					if (s.equals("tpDate"))
-						ps.setDate(i, new java.sql.Date(dateFormat.parse(criteria[4]).getTime()));
+						ps.setDate(i,
+								new java.sql.Date(dateFormat.parse(criteria[4])
+										.getTime()));
 					if (s.equals("fpTime"))
-						ps.setDate(i, new java.sql.Date(timeFormat.parse(criteria[3]).getTime()));
+						ps.setDate(i,
+								new java.sql.Date(timeFormat.parse(criteria[3])
+										.getTime()));
 					if (s.equals("tpTime"))
-						ps.setDate(i, new java.sql.Date(timeFormat.parse(criteria[5]).getTime()));
+						ps.setDate(i,
+								new java.sql.Date(timeFormat.parse(criteria[5])
+										.getTime()));
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
@@ -175,9 +183,15 @@ public class Database {
 	}
 
 	public boolean subtractAmounts(String type) {
-		String set = "update M set amountAvail -= amount "
-				+ "from Materials as M natural join Recipes "
-				+ "where pName = ?";
+		String set = "UPDATE Materials, Recipes"
+				+ "SET Materials.amountAvail = Materials.amountAvail - Recipes.amount * 54 "
+				+ "WHERE Materials.mName = Recipes.mName and "
+				+ "pName = ?";
+		
+//		String set = "UPDATE FROM Materials as m LEFT JOIN Recipes as r "
+//				+ "ON m.mName = r.mName "
+//				+ "SET amountAvail = (amountAvail - 54 * amount) "
+//				+ "WHERE pName = ?";
 		PreparedStatement ps;
 		try {
 			ps = conn.prepareStatement(set);
@@ -193,7 +207,7 @@ public class Database {
 		try {
 			updateAmounts();
 			if (checkAmounts(type)) {
-				String add = "insert into Pallets(pNbr, pName, pDate, pTime, blocked) values (?, ?, ?, ?, ?)";
+				String add = "insert into Pallets(pName, pDate, pTime, blocked) values (?, ?, ?, ?)";
 				PreparedStatement ps = conn.prepareStatement(add);
 
 				Date date = new Date();
@@ -201,11 +215,10 @@ public class Database {
 				String currentTime = timeFormat.format(cal.getTime());
 				String currentDate = dateFormat.format(date);
 
-				ps.setInt(1, 0);
-				ps.setString(2, type);
-				ps.setString(3, currentDate);
-				ps.setString(4, currentTime);
-				ps.setBoolean(5, false);
+				ps.setString(1, type);
+				ps.setString(2, currentDate);
+				ps.setString(3, currentTime);
+				ps.setBoolean(4, false);
 				ps.executeUpdate();
 
 				subtractAmounts(type);
