@@ -143,6 +143,7 @@ public class Database {
 					e.printStackTrace();
 				}
 			}
+			System.out.println(get);
 			pa.populate(ps.executeQuery());
 		} catch (SQLException e) {
 			e.printStackTrace();
