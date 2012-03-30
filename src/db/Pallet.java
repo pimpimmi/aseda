@@ -14,6 +14,10 @@ public class Pallet {
 		this.delivered = delivered;
 	}
 
+	public int getPNbr(){
+		return pNbr;
+	}
+	
 	public boolean getBlocked() {
 		return blocked;
 	}
@@ -37,6 +41,10 @@ public class Pallet {
 		else
 			s[5] = "no";
 		return s;
+	}
+
+	public boolean getDelivered() {
+		return delivered;
 	}
 
 }

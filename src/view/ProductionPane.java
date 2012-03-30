@@ -92,11 +92,11 @@ public class ProductionPane extends BasicPane{
 		ingrTableModel = new DefaultTableModel( null, new String [] {"Ingredient","Required", "Available"});
 		table.setModel(ingrTableModel);
 		table.setEnabled(false);
-		JScrollPane simulationScrollPane = new JScrollPane();
+		JScrollPane scrollPane = new JScrollPane();
 		for(int i = 0; i < table.getColumnCount(); i++)
 			table.getColumnModel().getColumn(i).setResizable(false);
-		 simulationScrollPane.setViewportView(table);
-		 return simulationScrollPane;
+		 scrollPane.setViewportView(table);
+		 return scrollPane;
 	}
 	
 	
@@ -109,6 +109,7 @@ public class ProductionPane extends BasicPane{
 
 		@Override
 		public void keyReleased(KeyEvent e) {
+			messageLabel.setText("");
 			int quantity = getQuantity();
 			if(quantity > 1000){
 				quantityText.setText("1000");
@@ -136,6 +137,7 @@ public class ProductionPane extends BasicPane{
 		public void actionPerformed(ActionEvent arg0) {
 			for(int i = 0; i < oldQuantity; i++)
 				db.createPallet((String) list.getSelectedValue());
+			updateList();
 		}
 		
 	}
@@ -152,26 +154,32 @@ public class ProductionPane extends BasicPane{
 
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
-			Product p = pr.getProduct((String)list.getSelectedValue());
-			for(int i = 0; i < ingrTableModel.getRowCount(); i++)
-				ingrTableModel.removeRow(0);
-			ArrayList<String> ingredientNames = p.getIngredients();
-			ArrayList<Integer> neededAmount = p.getQuantities();
-			int quantity = getQuantity();
-			for(int i = 0; i < ingredientNames.size(); i++){
-				Object[] row = new Object[3];
-				String name = ingredientNames.get(i);
-				long needed = neededAmount.get(i)*quantity*54;
-				long available = in.getAmount(name);
-				row[0] = name;
-				row[1] = needed;
-				row[2] = available;
-				ingrTableModel.addRow(row);
-				if(needed > available)
-					messageLabel.setText("Not enough " + name + "!");
-			}
+			updateList();
 				
 		}		
+	}
+
+	public void updateList() {
+		messageLabel.setText("");
+		Product p = pr.getProduct((String)list.getSelectedValue());
+		for(int i = ingrTableModel.getRowCount()-1; i >=0; i--)
+			ingrTableModel.removeRow(0);
+		ArrayList<String> ingredientNames = p.getIngredients();
+		ArrayList<Integer> neededAmount = p.getQuantities();
+		int quantity = getQuantity();
+		for(int i = 0; i < ingredientNames.size(); i++){
+			Object[] row = new Object[3];
+			String name = ingredientNames.get(i);
+			long needed = neededAmount.get(i)*quantity*54;
+			long available = in.getAmount(name);
+			row[0] = name;
+			row[1] = needed;
+			row[2] = available;
+			ingrTableModel.addRow(row);
+			if(needed > available)
+				messageLabel.setText("Not enough " + name + "!");
+		}
+		
 	}
 	
 

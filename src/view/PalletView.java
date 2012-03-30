@@ -52,7 +52,7 @@ public class PalletView {
 		tabbedPane.addChangeListener(new ChangeHandler());
 		frame.addWindowListener(new WindowHandler());
 
-		frame.setSize(700,400);
+		frame.setSize(800,500);
 		frame.setVisible(true);
 		
 
