@@ -37,7 +37,8 @@ public class PalletMap {
 		palls.clear();
 		try {
 			info.first();
-			if (!info.isAfterLast()) {
+			if (info.next()) {
+				//TODO skippar den en?
 				boolean blocked, delivered;
 				int pNbr;
 				String pName, pDate, pTime;

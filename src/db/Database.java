@@ -114,11 +114,8 @@ public class Database {
 		}
 		if (crit)
 			get = get.substring(0, get.length() - 3);
-		System.out.println(get);
-
 		try {
 			PreparedStatement ps = conn.prepareStatement(get);
-			System.out.println(fields.size());
 			for (int i = 1; i <= fields.size(); i++) {
 				String s = fields.get(i-1);
 				if (s.equals("pNbr"))
@@ -126,38 +123,14 @@ public class Database {
 				if (s.equals("pName"))
 					ps.setString(i, criteria[1]);
 				try {
-					if (s.equals("fpDate")) {
-						System.out.println("fpDate: " + criteria[2]);
-						Date date = dateFormat.parse(criteria[2]);
-						System.out.println(date);
-						long ms = date.getTime();
-						java.sql.Date d = new java.sql.Date(ms);
-						ps.setDate(i, d);
-					}
-					if (s.equals("tpDate")){
-						System.out.println("tpDate: " + criteria[4]);
-						Date date = dateFormat.parse(criteria[4]);
-						System.out.println(date);
-						long ms = date.getTime();
-						java.sql.Date d = new java.sql.Date(ms);
-						ps.setDate(i, d);
-					}
-					if (s.equals("fpTime")) {
-						System.out.println("fpTime: " + criteria[3]);
-						Date time = timeFormat.parse(criteria[3]);
-						System.out.println(time);
-						long ms = time.getTime();
-						java.sql.Date d = new java.sql.Date(ms);
-						ps.setDate(i, d);
-					}
-					if (s.equals("tpTime")){
-						System.out.println("tpTime: " + criteria[5]);
-						Date time = timeFormat.parse(criteria[5]);
-						System.out.println(time);
-						long ms = time.getTime();
-						java.sql.Date d = new java.sql.Date(ms);
-						ps.setDate(i, d);
-					}
+					if (s.equals("fpDate"))
+						ps.setDate(i, new java.sql.Date(dateFormat.parse(criteria[2]).getTime()));
+					if (s.equals("tpDate"))
+						ps.setDate(i, new java.sql.Date(dateFormat.parse(criteria[4]).getTime()));
+					if (s.equals("fpTime"))
+						ps.setDate(i, new java.sql.Date(timeFormat.parse(criteria[3]).getTime()));
+					if (s.equals("tpTime"))
+						ps.setDate(i, new java.sql.Date(timeFormat.parse(criteria[5]).getTime()));
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
