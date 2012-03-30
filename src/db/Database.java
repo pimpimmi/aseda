@@ -195,7 +195,7 @@ public class Database {
 				ps.setString(2, type);
 				ps.setString(3, currentDate);
 				ps.setString(4, currentTime);
-				ps.setInt(5, Pallet.UNBLOCKED);
+				ps.setBoolean(5, false);
 				ps.executeUpdate();
 
 				subtractAmounts(type);
