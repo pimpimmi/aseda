@@ -160,30 +160,15 @@ public class Database {
 	}
 
 	public boolean checkAmounts(String type) {
-//		String get = "select mName, amount from Recipes where mName = ?";
-//		PreparedStatement ps;
-//		try {
-//			ps = conn.prepareStatement(get);
-//			ps.setString(1, type);
-//			ResultSet rs = ps.executeQuery();
-//			rs.first();
-//			ArrayList<String> ingredients = new ArrayList<String>();
-//			ArrayList<Integer> quantities = new ArrayList<Integer>();
-//			do {
-//				ingredients.add(rs.getString(1));
-//				quantities.add(rs.getInt(2));
-//			} while (rs.next());
-			ArrayList<String> ingredients = pr.getProduct(type).getIngredients();
-			ArrayList<Integer> quantities = pr.getProduct(type).getQuantities();
-			if (!in.checkAvailable(ingredients, quantities)){			
-				return false;
-			} else {				
-				return true;
-			}
 
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
+		ArrayList<String> ingredients = pr.getProduct(type).getIngredients();
+		ArrayList<Integer> quantities = pr.getProduct(type).getQuantities();
+		if (!in.checkAvailable(ingredients, quantities)) {
+			return false;
+		} else {
+			return true;
+		}
+
 	}
 
 	public boolean subtractAmounts(String type) {
@@ -195,6 +180,7 @@ public class Database {
 		// "SET Materials.amountAvail = Materials.amountAvail - Recipes.amount * 54 "
 		// + "WHERE Materials.mName = Recipes.mName and "
 		// + "pName = ?";
+		//TODO Fixa så det inte är massor anrop?
 		for (String s : pr.getProduct(type).getIngredients()) {
 			try {
 				String get1 = "Select amount from Recipes where pName = ? and mName = ?";
@@ -222,12 +208,12 @@ public class Database {
 				e.printStackTrace();
 			}
 		}
+		updateAmounts();
 		return true;
 	}
 
 	public boolean createPallet(String type) {
 		try {
-			updateAmounts();
 			if (checkAmounts(type)) {
 				String add = "insert into Pallets(pName, pDate, pTime, blocked, delivered) values (?, ?, ?, ?, ?)";
 				PreparedStatement ps = conn.prepareStatement(add);
@@ -245,31 +231,28 @@ public class Database {
 				ps.executeUpdate();
 
 				subtractAmounts(type);
-
 				return true;
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return false;
 
 	}
 
-	public boolean block(int id) {
-		if (Math.random() > 0.9)
-			return false;
-		else {
-			return pa.block(id);
+	public boolean setBlock(int pNbr, boolean setting) {
+		String block = "update Pallets set blocked = ? where pNbr = ?";
+		PreparedStatement ps;
+		try {
+			ps = conn.prepareStatement(block);
+			ps.setBoolean(1, setting);
+			ps.setInt(2, pNbr);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
-	}
 
-	public boolean unblock(int id) {
-		if (Math.random() > 0.9)
-			return false;
-		else {
-			return pa.unblock(id);
-		}
+		return pa.setBlock(pNbr, setting);
 	}
 
 	public String[] getProductList() {

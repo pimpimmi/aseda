@@ -15,24 +15,16 @@ public class PalletMap {
 		palls.add(p);
 	}
 
-	public boolean block(int id) {
-		if (palls.get(id).getBlocked()) {
-			palls.get(id).setBlocked(true);
+	public boolean setBlock(int pNbr, boolean setting) {
+		if (palls.get(pNbr).getBlocked() != setting) {
+			palls.get(pNbr).setBlocked(setting);
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	public boolean unblock(int id) {
-		if (!palls.get(id).getBlocked()) {
-			palls.get(id).setBlocked(false);
-			return true;
-		} else {
-			return false;
-		}
-	}
-
+	
 	public void populate(ResultSet info) {
 		palls.clear();
 		try {
