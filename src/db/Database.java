@@ -160,45 +160,67 @@ public class Database {
 	}
 
 	public boolean checkAmounts(String type) {
-		String get = "select mName, amount from Recipes where mName = ?";
-		PreparedStatement ps;
-		try {
-			ps = conn.prepareStatement(get);
-			ps.setString(1, type);
-			ResultSet rs = ps.executeQuery();
-			ArrayList<String> ingredients = new ArrayList<String>();
-			ArrayList<Integer> quantities = new ArrayList<Integer>();
-			do {
-				ingredients.add(rs.getString(1));
-				quantities.add(rs.getInt(2));
-			} while (rs.next());
-
-			if (!in.checkAvailable(ingredients, quantities))
+//		String get = "select mName, amount from Recipes where mName = ?";
+//		PreparedStatement ps;
+//		try {
+//			ps = conn.prepareStatement(get);
+//			ps.setString(1, type);
+//			ResultSet rs = ps.executeQuery();
+//			rs.first();
+//			ArrayList<String> ingredients = new ArrayList<String>();
+//			ArrayList<Integer> quantities = new ArrayList<Integer>();
+//			do {
+//				ingredients.add(rs.getString(1));
+//				quantities.add(rs.getInt(2));
+//			} while (rs.next());
+			ArrayList<String> ingredients = pr.getProduct(type).getIngredients();
+			ArrayList<Integer> quantities = pr.getProduct(type).getQuantities();
+			if (!in.checkAvailable(ingredients, quantities)){			
 				return false;
+			} else {				
+				return true;
+			}
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return true;
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	public boolean subtractAmounts(String type) {
-		String set = "UPDATE Materials, Recipes"
-				+ "SET Materials.amountAvail = Materials.amountAvail - Recipes.amount * 54 "
-				+ "WHERE Materials.mName = Recipes.mName and "
-				+ "pName = ?";
-		
-//		String set = "UPDATE FROM Materials as m LEFT JOIN Recipes as r "
-//				+ "ON m.mName = r.mName "
-//				+ "SET amountAvail = (amountAvail - 54 * amount) "
-//				+ "WHERE pName = ?";
 		PreparedStatement ps;
-		try {
-			ps = conn.prepareStatement(set);
-			ps.setString(1, type);
-			ps.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		ResultSet rs;
+		int amount, amountAvail;
+		// String set = "UPDATE Materials, Recipes"
+		// +
+		// "SET Materials.amountAvail = Materials.amountAvail - Recipes.amount * 54 "
+		// + "WHERE Materials.mName = Recipes.mName and "
+		// + "pName = ?";
+		for (String s : pr.getProduct(type).getIngredients()) {
+			try {
+				String get1 = "Select amount from Recipes where pName = ? and mName = ?";
+				ps = conn.prepareStatement(get1);
+				ps.setString(1, type);
+				ps.setString(2, s);
+				rs = ps.executeQuery();
+				rs.first();
+				String get2 = "Select amountAvail from Materials where mName = ?";
+				amount = 54 * Integer.valueOf(rs.getString(1));
+				ps = conn.prepareStatement(get2);
+				ps.setString(1, s);
+				rs = ps.executeQuery();
+				rs.first();
+				amountAvail = Integer.valueOf(rs.getString(1));
+				amountAvail-=amount;
+				String set = "UPDATE Materials "
+						+ "SET amountAvail=? "
+						+ "WHERE mName = ?";
+				ps = conn.prepareStatement(set);
+				ps.setInt(1, amountAvail);
+				ps.setString(2, s);
+				ps.executeUpdate();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return true;
 	}
@@ -207,7 +229,7 @@ public class Database {
 		try {
 			updateAmounts();
 			if (checkAmounts(type)) {
-				String add = "insert into Pallets(pName, pDate, pTime, blocked) values (?, ?, ?, ?)";
+				String add = "insert into Pallets(pName, pDate, pTime, blocked, delivered) values (?, ?, ?, ?, ?)";
 				PreparedStatement ps = conn.prepareStatement(add);
 
 				Date date = new Date();
@@ -219,6 +241,7 @@ public class Database {
 				ps.setString(2, currentDate);
 				ps.setString(3, currentTime);
 				ps.setBoolean(4, false);
+				ps.setBoolean(5, false);
 				ps.executeUpdate();
 
 				subtractAmounts(type);
