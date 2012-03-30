@@ -15,13 +15,15 @@ public class PalletMap {
 		palls.add(p);
 	}
 
-	public boolean setBlock(int pNbr, boolean setting) {
-		if (palls.get(pNbr).getBlocked() != setting) {
-			palls.get(pNbr).setBlocked(setting);
-			return true;
-		} else {
-			return false;
+	public int[] setBlock(int[] pNbr, boolean setting) {
+		for(int i = 0; i < pNbr.length; i++){
+			Pallet p = palls.get(pNbr[i]);
+			if (p.getBlocked() != setting && p.getDelivered() == false)
+				p.setBlocked(setting);
+			else
+				pNbr[i] = -1;
 		}
+		return pNbr;
 	}
 
 	

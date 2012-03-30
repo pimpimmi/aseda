@@ -128,11 +128,12 @@ public class SearchBlockPane extends BasicPane{
 		tableModel = new DefaultTableModel( null, new String [] {"Pallet Number","Product", "Date", "Time","Blocked","Delivered"} );
 		table = new JTable();
 		table.setModel(tableModel);
-		JScrollPane simulationScrollPane = new JScrollPane();
+		table.enableInputMethods(false);
+		JScrollPane scrollPane = new JScrollPane();
 		for(int i = 0; i < table.getColumnCount(); i++)
 			table.getColumnModel().getColumn(i).setResizable(false);
-		simulationScrollPane.setViewportView(table);
-		return simulationScrollPane;
+		scrollPane.setViewportView(table);
+		return scrollPane;
 	}
 	
 	class ActionHandler implements ActionListener{
@@ -154,18 +155,23 @@ public class SearchBlockPane extends BasicPane{
 			else if(s.equals("Clear"))
 				clearSearch();
 			else if(s.equals("Block"))
-				blockPallet();
+				messageLabel.setText(setBlockPallet(true) + " pallets blocked!");
 			else
-				unblockPallet();
+				messageLabel.setText(setBlockPallet(false) + " pallets unblocked!");
 		}
 
-		private void unblockPallet() {
-			
-		}
-
-		private void blockPallet() {
-			// TODO Auto-generated method stub
-			
+		private int setBlockPallet(boolean status) {
+			int nbrOfUpdates = 0;
+			int[] rowIds = table.getSelectedRows();
+			for(int i : db.setBlock(rowIds, status))
+				if(i!=-1){
+					if(status)
+						tableModel.setValueAt("yes", i, 4);
+					else
+						tableModel.setValueAt("no", i, 4);
+					nbrOfUpdates++;
+				}
+			return nbrOfUpdates;
 		}
 
 		private void clearSearch() {
@@ -178,8 +184,8 @@ public class SearchBlockPane extends BasicPane{
 			for(int i = 0; i < 6; i++)
 				s[i] = searchFields[i].getText();
 			db.searchResult(s);
-			for(int i = 0; i < tableModel.getRowCount(); i++)
-				tableModel.removeRow(0);
+			for(int i = tableModel.getRowCount()-1; i >=0; i--)
+				tableModel.removeRow(i);
 			for(Pallet p : pa.palls){
 				tableModel.addRow(p.getStrings());
 			}

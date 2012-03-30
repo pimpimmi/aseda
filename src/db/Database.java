@@ -241,19 +241,22 @@ public class Database {
 
 	}
 
-	public boolean setBlock(int pNbr, boolean setting) {
-		String block = "update Pallets set blocked = ? where pNbr = ?";
+	public int[] setBlock(int[] rowIds, boolean setting) {
+		String block = "update Pallets set blocked = ? where pNbr = ?"; // where dDate = NULL and (
+		for(int i = 1;i<rowIds.length;i++)
+			block += " or pNbr = ?";
+//		block += ")";
 		PreparedStatement ps;
 		try {
 			ps = conn.prepareStatement(block);
 			ps.setBoolean(1, setting);
-			ps.setInt(2, pNbr);
+			for(int i = 0; i<rowIds.length; i++)
+				ps.setInt(2+i, pa.palls.get(rowIds[i]).getPNbr());
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
-		return pa.setBlock(pNbr, setting);
+		return pa.setBlock(rowIds, setting);
 	}
 
 	public String[] getProductList() {
