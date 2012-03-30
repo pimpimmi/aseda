@@ -143,6 +143,7 @@ public class Database {
 					e.printStackTrace();
 				}
 			}
+			System.out.println(get);
 			pa.populate(ps.executeQuery());
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -223,7 +224,7 @@ public class Database {
 		String block = "update Pallets set blocked = ? where pNbr = ?"; // where dDate = NULL and (
 		for(int i = 1;i<rowIds.length;i++)
 			block += " or pNbr = ?";
-//		block += ")";
+//		block += ");
 		PreparedStatement ps;
 		try {
 			ps = conn.prepareStatement(block);
