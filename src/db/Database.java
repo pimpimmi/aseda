@@ -80,7 +80,7 @@ public class Database {
 
 	public void searchResult(String[] criteria) {
 		ArrayList<String> fields = new ArrayList<String>();
-		String get = "select pNbr, pName, pDate, pTime, blocked, delivered from Pallets";
+		String get = "select pNbr, pName, pDate, pTime, blocked, dDate from Pallets";
 		boolean crit = false;
 		if (!(criteria[0].equals("") && criteria[1].equals("")
 				&& criteria[2].equals("") && criteria[3].equals("")
@@ -159,11 +159,11 @@ public class Database {
 		}
 	}
 
-	public boolean checkAmounts(String type) {
+	public boolean checkAmounts(String type, int amount) {
 
 		ArrayList<String> ingredients = pr.getProduct(type).getIngredients();
 		ArrayList<Integer> quantities = pr.getProduct(type).getQuantities();
-		if (!in.checkAvailable(ingredients, quantities)) {
+		if (!in.checkAvailable(ingredients, quantities, amount)) {
 			return false;
 		} else {
 			return true;
@@ -171,66 +171,45 @@ public class Database {
 
 	}
 
-	public boolean subtractAmounts(String type) {
+	public boolean subtractAmounts(String type, int quantity) {
 		PreparedStatement ps;
-		ResultSet rs;
-		int amount, amountAvail;
-		// String set = "UPDATE Materials, Recipes"
-		// +
-		// "SET Materials.amountAvail = Materials.amountAvail - Recipes.amount * 54 "
-		// + "WHERE Materials.mName = Recipes.mName and "
-		// + "pName = ?";
-		//TODO Fixa så det inte är massor anrop?
-		for (String s : pr.getProduct(type).getIngredients()) {
-			try {
-				String get1 = "Select amount from Recipes where pName = ? and mName = ?";
-				ps = conn.prepareStatement(get1);
-				ps.setString(1, type);
-				ps.setString(2, s);
-				rs = ps.executeQuery();
-				rs.first();
-				String get2 = "Select amountAvail from Materials where mName = ?";
-				amount = 54 * Integer.valueOf(rs.getString(1));
-				ps = conn.prepareStatement(get2);
-				ps.setString(1, s);
-				rs = ps.executeQuery();
-				rs.first();
-				amountAvail = Integer.valueOf(rs.getString(1));
-				amountAvail-=amount;
-				String set = "UPDATE Materials "
-						+ "SET amountAvail=? "
-						+ "WHERE mName = ?";
-				ps = conn.prepareStatement(set);
-				ps.setInt(1, amountAvail);
-				ps.setString(2, s);
-				ps.executeUpdate();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+		try {
+			String get1 = "update Materials m, Recipes r" +
+					" set m.amountAvail = m.amountAvail - r.amount*54*" + String.valueOf(quantity) + 
+					" where m.mName = r.mName and r.pName = ?";
+			ps = conn.prepareStatement(get1);
+			ps.setString(1, type);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		updateAmounts();
 		return true;
 	}
 
-	public boolean createPallet(String type) {
+	public boolean createPallet(String type, int quantity) {
 		try {
-			if (checkAmounts(type)) {
-				String add = "insert into Pallets(pName, pDate, pTime, blocked, delivered) values (?, ?, ?, ?, ?)";
-				PreparedStatement ps = conn.prepareStatement(add);
-
+			if (checkAmounts(type, quantity)) {
 				Date date = new Date();
 				Calendar cal = Calendar.getInstance();
 				String currentTime = timeFormat.format(cal.getTime());
 				String currentDate = dateFormat.format(date);
-
-				ps.setString(1, type);
-				ps.setString(2, currentDate);
-				ps.setString(3, currentTime);
-				ps.setBoolean(4, false);
-				ps.setDate(5, null);
+				String add = "insert into Pallets(pName, pDate, pTime, blocked) values";
+				for(int i = 0; i < quantity; i++){
+					add += " (?,?,?,?),";
+				}
+				add = add.substring(0, add.length()-1);
+				
+				PreparedStatement ps = conn.prepareStatement(add);
+				for(int i = 0; i < quantity; i++){
+					ps.setString(1+i*4, type);
+					ps.setString(2+i*4, currentDate);
+					ps.setString(3+i*4, currentTime);
+					ps.setBoolean(4+i*4, false);
+				}
 				ps.executeUpdate();
 
-				subtractAmounts(type);
+				subtractAmounts(type, quantity);
 				return true;
 			}
 		} catch (SQLException e) {
