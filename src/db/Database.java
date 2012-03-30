@@ -28,6 +28,8 @@ public class Database {
 		pr = prod;
 		in = ingr;
 		updateAmounts();
+		dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		timeFormat = new SimpleDateFormat("HH:mm");
 
 		String pop = "select * from Recipes";
 		try {
@@ -112,17 +114,50 @@ public class Database {
 		}
 		if (crit)
 			get = get.substring(0, get.length() - 3);
+		System.out.println(get);
+
 		try {
 			PreparedStatement ps = conn.prepareStatement(get);
+			System.out.println(fields.size());
 			for (int i = 1; i <= fields.size(); i++) {
-				String s = fields.remove(0);
-				if (s.equals("pNbr") || s.equals("pName"))
-					ps.setString(i, s);
+				String s = fields.get(i-1);
+				if (s.equals("pNbr"))
+					ps.setString(i, criteria[0]);
+				if (s.equals("pName"))
+					ps.setString(i, criteria[1]);
 				try {
-					if (s.equals("fpDate") || s.equals("tpDate"))
-						ps.setDate(i, (java.sql.Date) dateFormat.parse(s));
-					if (s.equals("fpTime") || s.equals("tpTime"))
-						ps.setTime(i, (java.sql.Time) timeFormat.parse(s));
+					if (s.equals("fpDate")) {
+						System.out.println("fpDate: " + criteria[2]);
+						Date date = dateFormat.parse(criteria[2]);
+						System.out.println(date);
+						long ms = date.getTime();
+						java.sql.Date d = new java.sql.Date(ms);
+						ps.setDate(i, d);
+					}
+					if (s.equals("tpDate")){
+						System.out.println("tpDate: " + criteria[4]);
+						Date date = dateFormat.parse(criteria[4]);
+						System.out.println(date);
+						long ms = date.getTime();
+						java.sql.Date d = new java.sql.Date(ms);
+						ps.setDate(i, d);
+					}
+					if (s.equals("fpTime")) {
+						System.out.println("fpTime: " + criteria[3]);
+						Date time = timeFormat.parse(criteria[3]);
+						System.out.println(time);
+						long ms = time.getTime();
+						java.sql.Date d = new java.sql.Date(ms);
+						ps.setDate(i, d);
+					}
+					if (s.equals("tpTime")){
+						System.out.println("tpTime: " + criteria[5]);
+						Date time = timeFormat.parse(criteria[5]);
+						System.out.println(time);
+						long ms = time.getTime();
+						java.sql.Date d = new java.sql.Date(ms);
+						ps.setDate(i, d);
+					}
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
@@ -187,9 +222,6 @@ public class Database {
 			if (checkAmounts(type)) {
 				String add = "insert into Pallets(pNbr, pName, pDate, pTime, blocked) values (?, ?, ?, ?, ?)";
 				PreparedStatement ps = conn.prepareStatement(add);
-
-				dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-				timeFormat = new SimpleDateFormat("HH:mm");
 
 				Date date = new Date();
 				Calendar cal = Calendar.getInstance();
