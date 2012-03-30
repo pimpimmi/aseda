@@ -245,7 +245,7 @@ public class Database {
 		String block = "update Pallets set blocked = ? where pNbr = ?"; // where dDate = NULL and (
 		for(int i = 1;i<rowIds.length;i++)
 			block += " or pNbr = ?";
-//		block += ")";
+//		block += ");
 		PreparedStatement ps;
 		try {
 			ps = conn.prepareStatement(block);
