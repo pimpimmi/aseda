@@ -49,7 +49,7 @@ public class PalletMap {
 					pDate = info.getString(3);
 					pTime = info.getString(4);
 					blocked = info.getBoolean(5);
-					if(info.getDate(5)==null)
+					if(info.getDate(6)==null)
 						delivered = false;
 					else
 						delivered = true;
