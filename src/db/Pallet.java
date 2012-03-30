@@ -1,10 +1,8 @@
 package db;
 
 public class Pallet {
-	public static final int UNBLOCKED = 0;
-	private static final int BLOCKED = 1;
 	private int pNbr;
-	private String type, pDate, pTime, fDate, lDate;
+	private String type, pDate, pTime;
 	private boolean blocked, delivered;
 
 	public Pallet(int pNbr, String pName, String pDate, String pTime, boolean blocked, boolean delivered) {

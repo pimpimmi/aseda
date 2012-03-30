@@ -2,8 +2,6 @@ package view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -11,18 +9,14 @@ import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 
 import db.Database;
 import db.Pallet;
@@ -33,6 +27,11 @@ import db.PalletMap;
 public class SearchBlockPane extends BasicPane{
 
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private static int SEARCH_ID = 0, SEARCH_SORT = 1, SEARCH_FROM_DATE = 2, SEARCH_FROM_TIME = 3,
 			SEARCH_TO_DATE = 4, SEARCH_TO_TIME = 5, SEARCH_SIZE = 6;
 	
@@ -126,7 +125,7 @@ public class SearchBlockPane extends BasicPane{
 	
 	
 	public JComponent createTopPanel() {
-		tableModel = new DefaultTableModel( null, new String [] {"Pallet ID","Product", "Date", "Time","Blocked","Delivered"} );
+		tableModel = new DefaultTableModel( null, new String [] {"Pallet Number","Product", "Date", "Time","Blocked","Delivered"} );
 		table = new JTable();
 		table.setModel(tableModel);
 		JScrollPane simulationScrollPane = new JScrollPane();
@@ -182,6 +181,9 @@ public class SearchBlockPane extends BasicPane{
 				tableModel.removeRow(0);
 			for(Pallet p : pa.palls){
 				tableModel.addRow(p.getStrings());
+			}
+			if (pa.palls.isEmpty()){
+				System.out.println("No matching pallets!");
 			}
 		}
 		

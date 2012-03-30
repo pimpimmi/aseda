@@ -28,6 +28,8 @@ public class Database {
 		pr = prod;
 		in = ingr;
 		updateAmounts();
+		dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		timeFormat = new SimpleDateFormat("HH:mm");
 
 		String pop = "select * from Recipes";
 		try {
@@ -78,49 +80,68 @@ public class Database {
 
 	public void searchResult(String[] criteria) {
 		ArrayList<String> fields = new ArrayList<String>();
-		String get = "select * from Pallets";
-		if (!(criteria[0] == "" && criteria[1] == "" && criteria[2] == ""
-				&& criteria[3] == "" && criteria[4] == "" && criteria[5] == ""))
+		String get = "select pNbr, pName, pDate, pTime, blocked, delivered from Pallets";
+		boolean crit = false;
+		if (!(criteria[0].equals("") && criteria[1].equals("")
+				&& criteria[2].equals("") && criteria[3].equals("")
+				&& criteria[4].equals("") && criteria[5].equals(""))) {
 			get += " where";
-		if (criteria[0] != "") {
+			crit = true;
+		}
+		if (!criteria[0].equals("")) {
 			get += " pNbr = ? and";
 			fields.add("pNbr");
 		}
-		if (criteria[1] != "") {
-			get += "pName = ? and";
+		if (!criteria[1].equals("")) {
+			get += " pName = ? and";
 			fields.add("pName");
 		}
-		if (criteria[2] != "") {
-			get += "pDate > ?";
+		if (!criteria[2].equals("")) {
+			get += " pDate > ? and";
 			fields.add("fpDate");
 		}
-		if (criteria[3] != "") {
-			get += "pTime > ?";
+		if (!criteria[3].equals("")) {
+			get += " pTime > ? and";
 			fields.add("fpTime");
 		}
-		if (criteria[4] != "") {
-			get += "pDate < ?";
+		if (!criteria[4].equals("")) {
+			get += " pDate < ? and";
 			fields.add("tpDate");
 		}
-		if (criteria[5] != "") {
-			get += "pTime < ?";
+		if (!criteria[5].equals("")) {
+			get += " pTime < ? and";
 			fields.add("tpTime");
 		}
-		get = get.substring(0, get.length()-3);
+		if (crit)
+			get = get.substring(0, get.length() - 3);
 		try {
 			PreparedStatement ps = conn.prepareStatement(get);
-			for (int i = 0; i < fields.size(); i++) {
-				String s = fields.remove(0);
-				if (s == "pNbr" || s == "pName")
-					ps.setString(i, s);
-					try {
-						if (s == "fpDate" || s == "tpDate")
-						ps.setDate(i, (java.sql.Date) dateFormat.parse(s));
-						if (s == "fpTime" || s == "tpTime")
-							ps.setTime(i, (java.sql.Time) timeFormat.parse(s));
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
+			for (int i = 1; i <= fields.size(); i++) {
+				String s = fields.get(i - 1);
+				if (s.equals("pNbr"))
+					ps.setString(i, criteria[0]);
+				if (s.equals("pName"))
+					ps.setString(i, criteria[1]);
+				try {
+					if (s.equals("fpDate"))
+						ps.setDate(i,
+								new java.sql.Date(dateFormat.parse(criteria[2])
+										.getTime()));
+					if (s.equals("tpDate"))
+						ps.setDate(i,
+								new java.sql.Date(dateFormat.parse(criteria[4])
+										.getTime()));
+					if (s.equals("fpTime"))
+						ps.setDate(i,
+								new java.sql.Date(timeFormat.parse(criteria[3])
+										.getTime()));
+					if (s.equals("tpTime"))
+						ps.setDate(i,
+								new java.sql.Date(timeFormat.parse(criteria[5])
+										.getTime()));
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
 			}
 			pa.populate(ps.executeQuery());
 		} catch (SQLException e) {
@@ -139,91 +160,99 @@ public class Database {
 	}
 
 	public boolean checkAmounts(String type) {
-		String get = "select mName, amount from Recipes where mName = ?";
-		PreparedStatement ps;
-		try {
-			ps = conn.prepareStatement(get);
-			ps.setString(1, type);
-			ResultSet rs = ps.executeQuery();
-			ArrayList<String> ingredients = new ArrayList<String>();
-			ArrayList<Integer> quantities = new ArrayList<Integer>();
-			do {
-				ingredients.add(rs.getString(1));
-				quantities.add(rs.getInt(2));
-			} while (rs.next());
 
-			if (!in.checkAvailable(ingredients, quantities))
-				return false;
-
-		} catch (SQLException e) {
-			e.printStackTrace();
+		ArrayList<String> ingredients = pr.getProduct(type).getIngredients();
+		ArrayList<Integer> quantities = pr.getProduct(type).getQuantities();
+		if (!in.checkAvailable(ingredients, quantities)) {
+			return false;
+		} else {
+			return true;
 		}
-		return true;
+
 	}
 
 	public boolean subtractAmounts(String type) {
-		String set = "update M set amountAvail -= amount "
-				+ "from Materials as M natural join Recipes "
-				+ "where pName = ?";
 		PreparedStatement ps;
-		try {
-			ps = conn.prepareStatement(set);
-			ps.setString(1, type);
-			ps.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		ResultSet rs;
+		int amount, amountAvail;
+		// String set = "UPDATE Materials, Recipes"
+		// +
+		// "SET Materials.amountAvail = Materials.amountAvail - Recipes.amount * 54 "
+		// + "WHERE Materials.mName = Recipes.mName and "
+		// + "pName = ?";
+		//TODO Fixa så det inte är massor anrop?
+		for (String s : pr.getProduct(type).getIngredients()) {
+			try {
+				String get1 = "Select amount from Recipes where pName = ? and mName = ?";
+				ps = conn.prepareStatement(get1);
+				ps.setString(1, type);
+				ps.setString(2, s);
+				rs = ps.executeQuery();
+				rs.first();
+				String get2 = "Select amountAvail from Materials where mName = ?";
+				amount = 54 * Integer.valueOf(rs.getString(1));
+				ps = conn.prepareStatement(get2);
+				ps.setString(1, s);
+				rs = ps.executeQuery();
+				rs.first();
+				amountAvail = Integer.valueOf(rs.getString(1));
+				amountAvail-=amount;
+				String set = "UPDATE Materials "
+						+ "SET amountAvail=? "
+						+ "WHERE mName = ?";
+				ps = conn.prepareStatement(set);
+				ps.setInt(1, amountAvail);
+				ps.setString(2, s);
+				ps.executeUpdate();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
+		updateAmounts();
 		return true;
 	}
 
 	public boolean createPallet(String type) {
 		try {
-			updateAmounts();
 			if (checkAmounts(type)) {
-				String add = "insert into Pallets(pNbr, pName, pDate, pTime, blocked) values (?, ?, ?, ?, ?)";
+				String add = "insert into Pallets(pName, pDate, pTime, blocked, delivered) values (?, ?, ?, ?, ?)";
 				PreparedStatement ps = conn.prepareStatement(add);
-
-				dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-				timeFormat = new SimpleDateFormat("HH:mm");
 
 				Date date = new Date();
 				Calendar cal = Calendar.getInstance();
 				String currentTime = timeFormat.format(cal.getTime());
 				String currentDate = dateFormat.format(date);
 
-				ps.setInt(1, 0);
-				ps.setString(2, type);
-				ps.setString(3, currentDate);
-				ps.setString(4, currentTime);
-				ps.setInt(5, Pallet.UNBLOCKED);
+				ps.setString(1, type);
+				ps.setString(2, currentDate);
+				ps.setString(3, currentTime);
+				ps.setBoolean(4, false);
+				ps.setDate(5, null);
 				ps.executeUpdate();
 
 				subtractAmounts(type);
-
 				return true;
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return false;
 
 	}
 
-	public boolean block(int id) {
-		if (Math.random() > 0.9)
-			return false;
-		else {
-			return pa.block(id);
+	public boolean setBlock(int pNbr, boolean setting) {
+		String block = "update Pallets set blocked = ? where pNbr = ?";
+		PreparedStatement ps;
+		try {
+			ps = conn.prepareStatement(block);
+			ps.setBoolean(1, setting);
+			ps.setInt(2, pNbr);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
-	}
 
-	public boolean unblock(int id) {
-		if (Math.random() > 0.9)
-			return false;
-		else {
-			return pa.unblock(id);
-		}
+		return pa.setBlock(pNbr, setting);
 	}
 
 	public String[] getProductList() {
