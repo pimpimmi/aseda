@@ -5,9 +5,6 @@ package view;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import db.Database;
-
-
 import java.awt.*;
 
 /**
@@ -15,9 +12,6 @@ import java.awt.*;
  * the left panel and the right panel. The right panel in turn consist
  * of three panels on top of each other: bottom, middle and top. Subclasses
  * can choose to configure these panels as they wish.
- * <p>
- * The class contains a reference to the database object, so subclasses
- * can communicate with the database.
  */
 public class BasicPane extends JPanel {
 	private static final long serialVersionUID = 1;
@@ -30,11 +24,8 @@ public class BasicPane extends JPanel {
     /** 
      * Create a BasicPane object.
      *
-     * @param db The database object.
      */
-    public BasicPane() {
-        
-    }
+    public BasicPane() {}
     
     public void setUpPane(){
     	messageLabel = new JLabel("      ");

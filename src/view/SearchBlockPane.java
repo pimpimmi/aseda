@@ -3,7 +3,6 @@ package view;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -11,7 +10,6 @@ import java.util.Date;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -20,49 +18,45 @@ import javax.swing.table.DefaultTableModel;
 
 import db.Database;
 import db.Pallet;
-import db.PalletMap;
+import db.PalletList;
 
 
-
+/**
+ * A tab in the user interface which handles the searching
+ * and blocking of pallets.
+ */
 public class SearchBlockPane extends BasicPane{
-
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private static int SEARCH_ID = 0, SEARCH_SORT = 1, SEARCH_FROM_DATE = 2, SEARCH_FROM_TIME = 3,
 			SEARCH_TO_DATE = 4, SEARCH_TO_TIME = 5, SEARCH_SIZE = 6;
-	
-	PalletMap pa;
+	PalletList pa;
 	Database db;
-	
-	DefaultTableModel tableModel;
-	
+	DefaultTableModel palletTableModel;
 	private JTextField[] searchFields;
 	JButton[][] searchButtons;
-	JTable table;
+	JTable palletTable;
 	
-	DateFormat dateFormat;
-	DateFormat timeFormat;
-	
-	public SearchBlockPane(PalletMap pa, Database db) {
+	/**
+	 * Creates a SearchBlockPane.
+	 * 
+	 * @param pr A list of search results.
+	 * @param db The database.
+	 */
+	public SearchBlockPane(PalletList pa, Database db) {
 		this.pa = pa;
 		this.db = db;
 		setUpPane();
 	}
-
 	
 	
-//	public JComponent createBottomPanel() {
-//		JButton[] buttons = new JButton[2];
-//		buttons[0] = new JButton("Block");
-//		buttons[1] = new JButton("Unblock");
-//		return new ButtonAndMessagePanel(buttons, messageLabel,
-//				new ActionHandler());	
-//	}
-	
+	/**
+	 * Creates an input panel for all search criteria and
+	 * a panel for all the search and block buttons.
+	 * Overrides the superclass method.
+	 * 
+	 * @return A panel.
+	 */
 	public JComponent createLeftPanel() {
 		String[] texts = new String[SEARCH_SIZE];
 		texts[SEARCH_ID] = "Pallet id";
@@ -71,31 +65,17 @@ public class SearchBlockPane extends BasicPane{
 		texts[SEARCH_TO_DATE] = "To date";
 		texts[SEARCH_TO_TIME] = "To time";
 		texts[SEARCH_SORT] = "Product";
-		
-		dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    	timeFormat = new SimpleDateFormat("HH:mm");
-    	
+				
     	searchFields = new JTextField[SEARCH_SIZE];
+    	    	
     	searchFields[SEARCH_ID] = new JTextField();
-
-    	Date date = new Date();
-    	Calendar cal = Calendar.getInstance();
-    	String currentTime = timeFormat.format(cal.getTime());
-    	
-		searchFields[SEARCH_TO_DATE] = new JTextField();
-		searchFields[SEARCH_TO_DATE].setText(dateFormat.format(date));
-		searchFields[SEARCH_TO_TIME] = new JTextField();
-		searchFields[SEARCH_TO_TIME].setText(currentTime);
-    	
-		
-		date.setTime(date.getTime()-604800000); // Current date minus one week
-		searchFields[SEARCH_FROM_DATE] = new JTextField();
-		searchFields[SEARCH_FROM_DATE].setText(dateFormat.format(date));
-		searchFields[SEARCH_FROM_TIME] = new JTextField();
-		searchFields[SEARCH_FROM_TIME].setText(currentTime);
-		
 		searchFields[SEARCH_SORT] = new JTextField(12);
-			
+		searchFields[SEARCH_TO_DATE] = new JTextField();
+		searchFields[SEARCH_TO_TIME] = new JTextField();
+		searchFields[SEARCH_FROM_DATE] = new JTextField();
+		searchFields[SEARCH_FROM_TIME] = new JTextField();
+		initSearchFields();
+		
 		JPanel p1 = new InputPanel(texts, searchFields);
 
 		searchButtons = new JButton[2][2];
@@ -113,30 +93,66 @@ public class SearchBlockPane extends BasicPane{
 		return p;
 	}
 	
+	private void initSearchFields(){
+		searchFields[SEARCH_ID].setText("");
+		searchFields[SEARCH_SORT].setText("");
+		
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    	DateFormat timeFormat = new SimpleDateFormat("HH:mm");
+    	Date date = new Date();
+    	Calendar cal = Calendar.getInstance();
+    	String currentTime = timeFormat.format(cal.getTime());
+    	
+		searchFields[SEARCH_TO_DATE].setText(dateFormat.format(date));
+		searchFields[SEARCH_TO_TIME].setText(currentTime);
+		
+		date.setTime(date.getTime()-604800000); // Current date minus one week
+		searchFields[SEARCH_FROM_DATE].setText(dateFormat.format(date));
+		searchFields[SEARCH_FROM_TIME].setText(currentTime);
+	}
 	
+	/**
+	 * Creates a table of search results. Overrides the superclass method.
+	 * 
+	 * @return A panel.
+	 */
 	public JComponent createTopPanel() {
-		tableModel = new DefaultTableModel( null, new String [] {"Pallet Number","Product", "Date", "Time","Blocked","Delivered"} );
-		table = new JTable();
-		table.setModel(tableModel);
-		table.enableInputMethods(false);
+		palletTableModel = new DefaultTableModel( null, new String [] {"Pallet Number","Product", "Date", "Time","Blocked","Delivered"} );
+		palletTable = new JTable();
+		palletTable.setModel(palletTableModel);
+		palletTable.enableInputMethods(false);
 		JScrollPane scrollPane = new JScrollPane();
-		for(int i = 0; i < table.getColumnCount(); i++)
-			table.getColumnModel().getColumn(i).setResizable(false);
-		scrollPane.setViewportView(table);
+		for(int i = 0; i < palletTable.getColumnCount(); i++)
+			palletTable.getColumnModel().getColumn(i).setResizable(false);
+		scrollPane.setViewportView(palletTable);
 		return scrollPane;
 	}
-	
-	class ActionHandler implements ActionListener{
 
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			
-		}
-		
+	/**
+	 * Sets up the search fields when entering tab. Overrides the superclass
+	 * method.
+	 */
+	public void entryActions() {
+		initSearchFields();
 	}
 	
+	/**
+	 * Listens for a click on any of the buttons.
+	 */
 	class SearchActionHandler implements ActionListener{
 
+		/**
+		 * Does an appropriate action depending on which button
+		 * is being clicked.
+		 * 
+		 * case Search: searches for pallets which fulfills the search
+		 * conditions.
+		 * case Clear: Clears all search fields.
+		 * case Block: Blocks the selected pallets.
+		 * case Unblock: Unblocks the selected pallets.
+		 * 
+		 * @params arg0 Not used.
+		 */
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			String s = ((JButton) arg0.getSource()).getText();
@@ -152,15 +168,15 @@ public class SearchBlockPane extends BasicPane{
 
 		private int setBlockPallet(boolean status) {
 			int nbrOfUpdates = 0;
-			int[] rowIds = table.getSelectedRows();
+			int[] rowIds = palletTable.getSelectedRows();
 			if(rowIds.length==0)
 				return 0;
 			for(int i : db.setBlock(rowIds, status))
 				if(i!=-1){
 					if(status)
-						tableModel.setValueAt("yes", i, 4);
+						palletTableModel.setValueAt("yes", i, 4);
 					else
-						tableModel.setValueAt("no", i, 4);
+						palletTableModel.setValueAt("no", i, 4);
 					nbrOfUpdates++;
 				}
 			return nbrOfUpdates;
@@ -183,10 +199,10 @@ public class SearchBlockPane extends BasicPane{
 				searchFields[SEARCH_ID].setText("");
 			}
 			db.searchResult(s);
-			for(int i = tableModel.getRowCount()-1; i >=0; i--)
-				tableModel.removeRow(i);
+			for(int i = palletTableModel.getRowCount()-1; i >=0; i--)
+				palletTableModel.removeRow(i);
 			for(Pallet p : pa.palls){
-				tableModel.addRow(p.getStrings());
+				palletTableModel.addRow(p.getStrings());
 			}
 			if (pa.palls.isEmpty()){
 				messageLabel.setText("No matching pallets!");
@@ -196,6 +212,5 @@ public class SearchBlockPane extends BasicPane{
 		}
 		
 	}
-	
 	
 }

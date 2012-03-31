@@ -14,14 +14,14 @@ import java.util.Date;
 public class Database {
 
 	private Connection conn;
-	private PalletMap pa;
+	private PalletList pa;
 	private ProductMap pr;
 	private Ingredients in;
 
 	private DateFormat dateFormat;
 	private DateFormat timeFormat;
 
-	public Database(PalletMap pall, ProductMap prod, Ingredients ingr) {
+	public Database(PalletList pall, ProductMap prod, Ingredients ingr) {
 		openConnection("db69", "shamoona");
 		pa = pall;
 		pr = prod;

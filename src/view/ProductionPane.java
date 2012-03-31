@@ -21,29 +21,35 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
 import db.Database;
 import db.Ingredients;
 import db.Product;
 import db.ProductMap;
 
-
+/**
+ * A tab in the user interface which handles the creating of
+ * pallets.
+ */
 public class ProductionPane extends BasicPane{
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
+	
 	DefaultTableModel ingrTableModel;
 	ProductMap pr;
 	Ingredients in;
 	Database db;
-	DefaultListModel listModel;
-	JList list;
+	DefaultListModel productListModel;
+	JList productList;
 	JTextField quantityText;
 	int oldQuantity;
-
+	
+	/**
+	 * Creates a ProductionPane.
+	 * 
+	 * @param db The database.
+	 * @param pr the map over all products.
+	 * @param in A list of all ingredients.
+	 */
 	public ProductionPane(ProductMap pr, Ingredients in, Database db) {
 		this.in = in;
 		this.pr = pr;
@@ -52,22 +58,32 @@ public class ProductionPane extends BasicPane{
 		setUpPane();
 	}
 	
-	
+	/**
+	 * Creates a list of products. Overrides the superclass method.
+	 * 
+	 * @return A panel.
+	 */
 	public JComponent createLeftPanel() {
-		listModel = new DefaultListModel();
-		list = new JList(listModel);
-		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setPrototypeCellValue("123456789012");
-		list.setFixedCellWidth(200);
+		productListModel = new DefaultListModel();
+		productList = new JList(productListModel);
+		productList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		productList.setPrototypeCellValue("123456789012");
+		productList.setFixedCellWidth(200);
 		Set<String> productNames = pr.keySet();
 		for(String s : productNames)
-			listModel.addElement(s);
-		list.addListSelectionListener(new ListFocusListener());
-		return new JScrollPane(list);
+			productListModel.addElement(s);
+		productList.addListSelectionListener(new ListFocusListener());
+		return new JScrollPane(productList);
 		
 		
 	}
 	
+	/**
+	 * Creates a button for creating pallets and a label to show
+	 * potential messages. Overrides the superclass method.
+	 * 
+	 * @return A panel.
+	 */
 	public JComponent createBottomPanel() {
 		JButton[] buttons = new JButton[1];
 		buttons[0] = new JButton("Create pallet");
@@ -75,22 +91,33 @@ public class ProductionPane extends BasicPane{
 				new ActionHandler());	
 	}
 	
+	/**
+	 * Creates a textfield for input of quantity of pallets.
+	 * Overrides the superclass method.
+	 * 
+	 * @return A panel.
+	 */
 	public JComponent createTopPanel() {		
 		JLabel p1 = new JLabel("Quantity: ");
-
 		quantityText = new JTextField(5);
 		quantityText.setText("1");
 		quantityText.addKeyListener(new QuantityKeyListener());
 		JPanel p = new JPanel();
 		p.add(p1);
 		p.add(quantityText);
-		
 		return p;
 	}
 	
+	/**
+	 * Creates a table showing all ingredients needed to make
+	 * the pallet(s). Overrides the superclass method.
+	 * 
+	 * @return A panel.
+	 */
 	public JComponent createMiddlePanel() {
 		JTable table = new JTable();
-		ingrTableModel = new DefaultTableModel( null, new String [] {"Ingredient","Required", "Available"});
+		ingrTableModel = new DefaultTableModel( null, 
+				new String [] {"Ingredient","Required", "Available"});
 		table.setModel(ingrTableModel);
 		table.setEnabled(false);
 		JScrollPane scrollPane = new JScrollPane();
@@ -100,14 +127,25 @@ public class ProductionPane extends BasicPane{
 		 return scrollPane;
 	}
 	
-	
+	/**
+	 * A class which listens to keys.
+	 */
 	class QuantityKeyListener implements KeyListener{
 
+		/**
+		 * Not used.
+		 */
 		@Override
-		public void keyPressed(KeyEvent e) {
-			
-		}
-
+		public void keyPressed(KeyEvent e) {}
+		
+		/**
+		 * Used when the user changes the quantity textfield.
+		 * Updates the column in the ingredient table showing amounts
+		 * needed for the given quantity.
+		 * 
+		 * @param e
+		 *            The event object (not used).
+		 */
 		@Override
 		public void keyReleased(KeyEvent e) {
 			messageLabel.setText("");
@@ -131,24 +169,47 @@ public class ProductionPane extends BasicPane{
 			oldQuantity = quantity;
 		}
 
+		/**
+		 * Not used.
+		 */
 		@Override
-		public void keyTyped(KeyEvent e) {
-			
-		}
+		public void keyTyped(KeyEvent e) {}
 		
 	}
 	
+	/**
+	 * Listens to button clicks.
+	 */
 	class ActionHandler implements ActionListener{
-
+		
+		/**
+		 * Creates a number of pallets and updates the amount
+		 * of ingredients available.
+		 */
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if(db.createPallet((String) list.getSelectedValue(), oldQuantity))
+			if(db.createPallet((String) productList.getSelectedValue(), oldQuantity))
 				messageLabel.setText(oldQuantity + " pallets successfully created!");
 			else
 				messageLabel.setText("Pallets could not be created!");
 			updateList();
 		}
 		
+	}
+	
+	/**
+	 * Listens for new selection in the product list.
+	 */
+	class ListFocusListener implements ListSelectionListener{
+
+		/**
+		 * Updates the list of ingredients.
+		 */
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			messageLabel.setText("");
+			updateList();
+		}		
 	}
 	
 	private int getQuantity(){
@@ -158,18 +219,9 @@ public class ProductionPane extends BasicPane{
 			return 1;
 		}
 	}
-	
-	class ListFocusListener implements ListSelectionListener{
 
-		@Override
-		public void valueChanged(ListSelectionEvent e) {
-			messageLabel.setText("");
-			updateList();
-		}		
-	}
-
-	public void updateList() {
-		Product p = pr.getProduct((String)list.getSelectedValue());
+	private void updateList() {
+		Product p = pr.getProduct((String)productList.getSelectedValue());
 		for(int i = ingrTableModel.getRowCount()-1; i >=0; i--)
 			ingrTableModel.removeRow(0);
 		ArrayList<String> ingredientNames = p.getIngredients();

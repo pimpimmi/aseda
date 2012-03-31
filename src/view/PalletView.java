@@ -6,35 +6,33 @@ import javax.swing.event.*;
 
 import db.Database;
 import db.Ingredients;
-import db.PalletMap;
+import db.PalletList;
 import db.ProductMap;
 
 import java.awt.*;
 import java.awt.event.*;
 
 /**
- * MovieGUI is the user interface to the movie database. It sets up the main
- * window and connects to the database.
+ * PalletView is the user interface of the application. 
  */
 public class PalletView {
 	
-	Database da;
-	
-	/**
-	 * tabbedPane is the contents of the window. It consists of two panes, User
-	 * login and Book tickets.
-	 */
+
 	private JTabbedPane tabbedPane;
+	
+	private Database db;
 
 	/**
-	 * Create a GUI object and connect to the database.
+	 * Create a GUI object.
 	 * 
-	 * @param db
-	 *            The database.
+	 * @param db The database.
+	 * @param pa A list of pallets.
+	 * @param pr the map over all products.
+	 * @param in A list of all ingredients.
 	 */
-
-
-	public PalletView(Database db, PalletMap pa, ProductMap pr, Ingredients in) {
+	public PalletView(Database db, PalletList pa, ProductMap pr, Ingredients in) {
+		this.db = db;
+		
 		JFrame frame = new JFrame("Krusty Pallet Program");
 		tabbedPane = new JTabbedPane();
 
@@ -89,7 +87,7 @@ public class PalletView {
 		 *            The window event (not used).
 		 */
 		public void windowClosing(WindowEvent e) {
-			//da.closeConnection();
+			db.closeConnection();
 			System.exit(0);
 		}
 	}
