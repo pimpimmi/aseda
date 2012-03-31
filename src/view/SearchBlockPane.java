@@ -76,7 +76,7 @@ public class SearchBlockPane extends BasicPane{
     	timeFormat = new SimpleDateFormat("HH:mm");
     	
     	searchFields = new JTextField[SEARCH_SIZE];
-    	searchFields[SEARCH_ID] = new JFormattedTextField(NumberFormat.getIntegerInstance());
+    	searchFields[SEARCH_ID] = new JTextField();
 
     	Date date = new Date();
     	Calendar cal = Calendar.getInstance();
@@ -84,19 +84,15 @@ public class SearchBlockPane extends BasicPane{
     	
 		searchFields[SEARCH_TO_DATE] = new JTextField();
 		searchFields[SEARCH_TO_DATE].setText(dateFormat.format(date));
-//		searchFields[SEARCH_TO_DATE].addFocusListener(new DateHintListener(dateTemp));
 		searchFields[SEARCH_TO_TIME] = new JTextField();
 		searchFields[SEARCH_TO_TIME].setText(currentTime);
-//		searchFields[SEARCH_TO_TIME].addFocusListener(new TimeHintListener(currentTime));
     	
 		
 		date.setTime(date.getTime()-604800000); // Current date minus one week
 		searchFields[SEARCH_FROM_DATE] = new JTextField();
 		searchFields[SEARCH_FROM_DATE].setText(dateFormat.format(date));
-//		searchFields[SEARCH_FROM_DATE].addFocusListener(new DateHintListener(dateTemp));
 		searchFields[SEARCH_FROM_TIME] = new JTextField();
 		searchFields[SEARCH_FROM_TIME].setText(currentTime);
-//		searchFields[SEARCH_FROM_TIME].addFocusListener(new TimeHintListener(currentTime));
 		
 		searchFields[SEARCH_SORT] = new JTextField(12);
 			
@@ -105,21 +101,15 @@ public class SearchBlockPane extends BasicPane{
 		searchButtons = new JButton[2][2];
 		searchButtons[0][0] = new JButton("Search");
 		searchButtons[0][1] = new JButton("Clear");
-//		JPanel p2 = new JPanel();
-//		p2.add(searchButtons[0]);
-//		p2.add(searchButtons[1]);
-		
-//		JButton[] blockButtons = new JButton[2];
 		searchButtons[1][0] = new JButton("Block");
 		searchButtons[1][1] = new JButton("Unblock");
-		ButtonAndMessagePanel p3 = new ButtonAndMessagePanel(searchButtons, messageLabel,
+		ButtonAndMessagePanel p2 = new ButtonAndMessagePanel(searchButtons, messageLabel,
 				new SearchActionHandler());	
 
 		JPanel p = new JPanel();
 		p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
 		p.add(p1);
-//		p.add(p2);
-		p.add(p3);
+		p.add(p2);
 		return p;
 	}
 	
@@ -186,6 +176,12 @@ public class SearchBlockPane extends BasicPane{
 			String[] s = new String[6];
 			for(int i = 0; i < 6; i++)
 				s[i] = searchFields[i].getText();
+			try{
+				Integer.valueOf(s[SEARCH_ID]);
+			} catch (NumberFormatException nfe){
+				s[SEARCH_ID] = "";
+				searchFields[SEARCH_ID].setText("");
+			}
 			db.searchResult(s);
 			for(int i = tableModel.getRowCount()-1; i >=0; i--)
 				tableModel.removeRow(i);
@@ -194,46 +190,12 @@ public class SearchBlockPane extends BasicPane{
 			}
 			if (pa.palls.isEmpty()){
 				messageLabel.setText("No matching pallets!");
+			} else {
+				messageLabel.setText(String.valueOf(pa.palls.size()) + " results!");
 			}
 		}
 		
 	}
 	
-//	class DateHintListener implements FocusListener{
-//		
-//		String date;
-//		
-//		public DateHintListener(String date) {
-//			super();
-//			this.date = date;
-//		}
-//        public void focusGained(FocusEvent e) {}
-//
-//        public void focusLost(FocusEvent e) {
-//        	
-//        	JTextField temp = ((JTextField) e.getComponent());
-//            if (temp.getText().trim().equals("")) {
-//                temp.setText(dateFormat.format(date));
-//            }
-//        }
-//		
-//	}
-//	
-//	class TimeHintListener implements FocusListener{
-//
-//		public void focusGained(FocusEvent arg0) {}
-//		
-//        public void focusLost(FocusEvent e) {
-//        	
-//        	Calendar cal = Calendar.getInstance();
-//        	
-//        	JTextField temp = ((JTextField) e.getComponent());
-//            if (temp.getText().trim().equals("")) {
-//                temp.setText(dateFormat.format(cal.getTime()));
-//            }
-//        }
-//
-//		
-//	}
 	
 }

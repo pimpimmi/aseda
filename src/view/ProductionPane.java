@@ -142,7 +142,10 @@ public class ProductionPane extends BasicPane{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			db.createPallet((String) list.getSelectedValue(), oldQuantity);
+			if(db.createPallet((String) list.getSelectedValue(), oldQuantity))
+				messageLabel.setText(oldQuantity + " pallets successfully created!");
+			else
+				messageLabel.setText("Pallets could not be created!");
 			updateList();
 		}
 		
@@ -160,13 +163,12 @@ public class ProductionPane extends BasicPane{
 
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
+			messageLabel.setText("");
 			updateList();
-				
 		}		
 	}
 
 	public void updateList() {
-		messageLabel.setText("");
 		Product p = pr.getProduct((String)list.getSelectedValue());
 		for(int i = ingrTableModel.getRowCount()-1; i >=0; i--)
 			ingrTableModel.removeRow(0);
@@ -183,7 +185,7 @@ public class ProductionPane extends BasicPane{
 			row[2] = available;
 			ingrTableModel.addRow(row);
 			if(needed > available)
-				messageLabel.setText("Not enough ingredients!");
+				messageLabel.setText(messageLabel.getText() + " Not enough ingredients!");
 		}
 		
 	}

@@ -102,7 +102,7 @@ public class Database {
 				criteria[3] = "00:00:00";
 			else
 				criteria[3] += ":00";
-			get += " pDateTime > ? and";
+			get += " pDateTime >= ? and";
 			fields.add("fpDateTime");
 		}
 		if (!(criteria[4].equals("") && criteria[5].equals(""))) {
@@ -112,7 +112,7 @@ public class Database {
 				criteria[5] = "00:00:00";
 			else
 				criteria[5] += ":00";
-			get += " pDateTime < ? and";
+			get += " pDateTime <= ? and";
 			fields.add("tpDateTime");
 		}
 		if (crit)
@@ -122,9 +122,9 @@ public class Database {
 			for (int i = 1; i <= fields.size(); i++) {
 				String s = fields.get(i-1);
 				System.out.println(s + criteria[0]);
-				if (s.equals("pNbr"))
+				if (s.equals("pNbr")){
 					ps.setInt(i, Integer.valueOf(criteria[0]));
-				if (s.equals("pName"))
+				}if (s.equals("pName"))
 					ps.setString(i, criteria[1]);
 				if (s.equals("fpDateTime"))
 					ps.setString(i,criteria[2] + " " + criteria[3]);
