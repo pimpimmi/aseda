@@ -163,6 +163,8 @@ public class SearchBlockPane extends BasicPane{
 		private int setBlockPallet(boolean status) {
 			int nbrOfUpdates = 0;
 			int[] rowIds = table.getSelectedRows();
+			if(rowIds.length==0)
+				return 0;
 			for(int i : db.setBlock(rowIds, status))
 				if(i!=-1){
 					if(status)

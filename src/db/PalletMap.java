@@ -30,9 +30,7 @@ public class PalletMap {
 	public void populate(ResultSet info) {
 		palls.clear();
 		try {
-			info.first();
-			if (info.next()) {
-				info.first();
+			if (info.first()) {
 				boolean blocked, delivered;
 				int pNbr;
 				String pName, pDate, pTime;

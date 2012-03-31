@@ -117,7 +117,8 @@ public class Database {
 		try {
 			PreparedStatement ps = conn.prepareStatement(get);
 			for (int i = 1; i <= fields.size(); i++) {
-				String s = fields.get(i - 1);
+				String s = fields.get(i-1);
+				System.out.println(s + criteria[0]);
 				if (s.equals("pNbr"))
 					ps.setString(i, criteria[0]);
 				if (s.equals("pName"))
@@ -221,16 +222,17 @@ public class Database {
 	}
 
 	public int[] setBlock(int[] rowIds, boolean setting) {
-		String block = "update Pallets set blocked = ? where pNbr = ?"; // where dDate = NULL and (
+		String block = "update Pallets set blocked = ? where dDate is NULL and (pNbr = ?";
 		for(int i = 1;i<rowIds.length;i++)
 			block += " or pNbr = ?";
-//		block += ");
+		block += ")";
 		PreparedStatement ps;
 		try {
 			ps = conn.prepareStatement(block);
 			ps.setBoolean(1, setting);
 			for(int i = 0; i<rowIds.length; i++)
 				ps.setInt(2+i, pa.palls.get(rowIds[i]).getPNbr());
+			System.out.println(block);
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();

@@ -44,6 +44,8 @@ public class ProductMap {
 				ingredients.add(info.getString(2));
 				quantities.add(info.getInt(3));
 			} while (info.next());
+			addProduct(currProd, new Product(currProd, ingredients,
+					quantities));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
