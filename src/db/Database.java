@@ -79,7 +79,7 @@ public class Database {
 
 	public void searchResult(String[] criteria) {
 		ArrayList<String> fields = new ArrayList<String>();
-		String get = "select pNbr, pName, pDate, pTime, blocked, dDate from Pallets";
+		String get = "select pNbr, pName, pDateTime, blocked, dDateTime from Pallets";
 		boolean crit = false;
 		if (!(criteria[0].equals("") && criteria[1].equals("")
 				&& criteria[2].equals("") && criteria[3].equals("")
@@ -95,21 +95,25 @@ public class Database {
 			get += " pName = ? and";
 			fields.add("pName");
 		}
-		if (!criteria[2].equals("")) {
-			get += " pDate > ? and";
-			fields.add("fpDate");
+		if (!(criteria[2].equals("") && criteria[3].equals(""))) {
+			if(criteria[2].equals(""))
+				criteria[2] = "1000-01-01";
+			if(criteria[3].equals(""))
+				criteria[3] = "00:00:00";
+			else
+				criteria[3] += ":00";
+			get += " pDateTime > ? and";
+			fields.add("fpDateTime");
 		}
-		if (!criteria[3].equals("")) {
-			get += " pTime > ? and";
-			fields.add("fpTime");
-		}
-		if (!criteria[4].equals("")) {
-			get += " pDate < ? and";
-			fields.add("tpDate");
-		}
-		if (!criteria[5].equals("")) {
-			get += " pTime < ? and";
-			fields.add("tpTime");
+		if (!(criteria[4].equals("") && criteria[5].equals(""))) {
+			if(criteria[4].equals(""))
+				criteria[4] = "9999-12-31";
+			if(criteria[5].equals(""))
+				criteria[5] = "00:00:00";
+			else
+				criteria[5] += ":00";
+			get += " pDateTime < ? and";
+			fields.add("tpDateTime");
 		}
 		if (crit)
 			get = get.substring(0, get.length() - 3);
@@ -122,26 +126,10 @@ public class Database {
 					ps.setInt(i, Integer.valueOf(criteria[0]));
 				if (s.equals("pName"))
 					ps.setString(i, criteria[1]);
-				try {
-					if (s.equals("fpDate"))
-						ps.setDate(i,
-								new java.sql.Date(dateFormat.parse(criteria[2])
-										.getTime()));
-					if (s.equals("tpDate"))
-						ps.setDate(i,
-								new java.sql.Date(dateFormat.parse(criteria[4])
-										.getTime()));
-					if (s.equals("fpTime"))
-						ps.setTime(i,
-								new java.sql.Time(timeFormat.parse(criteria[3])
-										.getTime()));
-					if (s.equals("tpTime"))
-						ps.setTime(i,
-								new java.sql.Time(timeFormat.parse(criteria[5])
-										.getTime()));
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
+				if (s.equals("fpDateTime"))
+					ps.setString(i,criteria[2] + " " + criteria[3]);
+				if (s.equals("tpDateTime"))
+					ps.setString(i,criteria[4] + " " + criteria[5]);
 			}
 			System.out.println(ps.toString());
 			pa.populate(ps.executeQuery());
@@ -194,18 +182,17 @@ public class Database {
 				Calendar cal = Calendar.getInstance();
 				String currentTime = timeFormat.format(cal.getTime());
 				String currentDate = dateFormat.format(date);
-				String add = "insert into Pallets(pName, pDate, pTime, blocked) values";
+				String add = "insert into Pallets(pName, pDateTime, blocked) values";
 				for(int i = 0; i < quantity; i++){
-					add += " (?,?,?,?),";
+					add += " (?,?,?),";
 				}
 				add = add.substring(0, add.length()-1);
 				
 				PreparedStatement ps = conn.prepareStatement(add);
 				for(int i = 0; i < quantity; i++){
-					ps.setString(1+i*4, type);
-					ps.setString(2+i*4, currentDate);
-					ps.setString(3+i*4, currentTime);
-					ps.setBoolean(4+i*4, false);
+					ps.setString(1+i*3, type);
+					ps.setString(2+i*3, currentDate + " " + currentTime + ":00");
+					ps.setBoolean(3+i*3, false);
 				}
 				ps.executeUpdate();
 
@@ -220,7 +207,7 @@ public class Database {
 	}
 
 	public int[] setBlock(int[] rowIds, boolean setting) {
-		String block = "update Pallets set blocked = ? where dDate is NULL and (pNbr = ?";
+		String block = "update Pallets set blocked = ? where dDateTime is NULL and (pNbr = ?";
 		for(int i = 1;i<rowIds.length;i++)
 			block += " or pNbr = ?";
 		block += ")";

@@ -37,10 +37,11 @@ public class PalletMap {
 				do {
 					pNbr = info.getInt(1);
 					pName = info.getString(2);
-					pDate = info.getString(3);
-					pTime = info.getString(4);
-					blocked = info.getBoolean(5);
-					if (info.getDate(6) == null)
+					String temp = info.getString(3);
+					pDate = temp.substring(0,10);
+					pTime = temp.substring(10,16);
+					blocked = info.getBoolean(4);
+					if (info.getDate(5) == null)
 						delivered = false;
 					else
 						delivered = true;
