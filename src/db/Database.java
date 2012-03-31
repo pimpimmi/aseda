@@ -229,7 +229,8 @@ public class Database {
 			ps.setBoolean(1, setting);
 			for(int i = 0; i<rowIds.length; i++)
 				ps.setInt(2+i, pa.palls.get(rowIds[i]).getPNbr());
-			ps.executeUpdate();
+			if (rowIds.length != 0)
+				ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
