@@ -27,9 +27,9 @@ public class Ingredients {
 		return ingredients.get(mName);
 	}
 
-	public boolean checkAvailable(ArrayList<String> ing, ArrayList<Integer> amn) {
+	public boolean checkAvailable(ArrayList<String> ing, ArrayList<Integer> amn, int quantity) {
 		for (int i = 0; i < ing.size(); i++) {
-			if (ingredients.get(ing.get(i)) < amn.get(i))
+			if (ingredients.get(ing.get(i)) < amn.get(i)*quantity)
 				return false;
 		}
 		return true;

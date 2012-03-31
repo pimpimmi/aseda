@@ -21,6 +21,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 import db.Database;
 import db.Ingredients;
@@ -121,6 +122,12 @@ public class ProductionPane extends BasicPane{
 				newValue /= oldQuantity;
 				ingrTableModel.setValueAt(newValue , i, 1);
 			}
+			messageLabel.setText("");
+			for(int i = 0; i < ingrTableModel.getRowCount(); i++)
+				if(((Long) ingrTableModel.getValueAt(i, 1))>
+					((Long) ingrTableModel.getValueAt(i, 2)))
+					messageLabel.setText("Not enough ingredients!");
+			
 			oldQuantity = quantity;
 		}
 
@@ -135,8 +142,7 @@ public class ProductionPane extends BasicPane{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			for(int i = 0; i < oldQuantity; i++)
-				db.createPallet((String) list.getSelectedValue());
+			db.createPallet((String) list.getSelectedValue(), oldQuantity);
 			updateList();
 		}
 		
@@ -177,7 +183,7 @@ public class ProductionPane extends BasicPane{
 			row[2] = available;
 			ingrTableModel.addRow(row);
 			if(needed > available)
-				messageLabel.setText("Not enough " + name + "!");
+				messageLabel.setText("Not enough ingredients!");
 		}
 		
 	}
