@@ -3,7 +3,6 @@ package db;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -120,7 +119,7 @@ public class Database {
 				String s = fields.get(i-1);
 				System.out.println(s + criteria[0]);
 				if (s.equals("pNbr"))
-					ps.setString(i, criteria[0]);
+					ps.setInt(i, Integer.valueOf(criteria[0]));
 				if (s.equals("pName"))
 					ps.setString(i, criteria[1]);
 				try {
@@ -133,18 +132,18 @@ public class Database {
 								new java.sql.Date(dateFormat.parse(criteria[4])
 										.getTime()));
 					if (s.equals("fpTime"))
-						ps.setDate(i,
-								new java.sql.Date(timeFormat.parse(criteria[3])
+						ps.setTime(i,
+								new java.sql.Time(timeFormat.parse(criteria[3])
 										.getTime()));
 					if (s.equals("tpTime"))
-						ps.setDate(i,
-								new java.sql.Date(timeFormat.parse(criteria[5])
+						ps.setTime(i,
+								new java.sql.Time(timeFormat.parse(criteria[5])
 										.getTime()));
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
 			}
-			System.out.println(get);
+			System.out.println(ps.toString());
 			pa.populate(ps.executeQuery());
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -162,7 +161,6 @@ public class Database {
 	}
 
 	public boolean checkAmounts(String type, int amount) {
-
 		ArrayList<String> ingredients = pr.getProduct(type).getIngredients();
 		ArrayList<Integer> quantities = pr.getProduct(type).getQuantities();
 		if (!in.checkAvailable(ingredients, quantities, amount)) {
@@ -232,8 +230,8 @@ public class Database {
 			ps.setBoolean(1, setting);
 			for(int i = 0; i<rowIds.length; i++)
 				ps.setInt(2+i, pa.palls.get(rowIds[i]).getPNbr());
-			System.out.println(block);
-			ps.executeUpdate();
+			if (rowIds.length != 0)
+				ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
