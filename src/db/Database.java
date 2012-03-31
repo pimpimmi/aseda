@@ -5,12 +5,14 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-
+/**
+ * The database containing all the data concerning the
+ * application.
+ */
 public class Database {
 
 	private Connection conn;
@@ -21,6 +23,15 @@ public class Database {
 	private DateFormat dateFormat;
 	private DateFormat timeFormat;
 
+	
+	/**
+	 * Creates a database object, opens a connection and
+	 * populates the map of products and ingredients.
+	 * 
+	 * @param pall The list of pallets.
+	 * @param prod The map of products.
+	 * @param ingr The ingredients.
+	 */
 	public Database(PalletList pall, ProductMap prod, Ingredients ingr) {
 		openConnection("db69", "shamoona");
 		pa = pall;
@@ -39,7 +50,7 @@ public class Database {
 		}
 	}
 
-	public boolean openConnection(String userName, String password) {
+	private boolean openConnection(String userName, String password) {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			conn = DriverManager.getConnection(
@@ -77,6 +88,12 @@ public class Database {
 		return conn != null;
 	}
 
+	/**
+	 * Search for pallets meeting the criteria and
+	 * store the results in the list of pallets.
+	 * 
+	 * @param criteria An array of different criteria
+	 */
 	public void searchResult(String[] criteria) {
 		ArrayList<String> fields = new ArrayList<String>();
 		String get = "select pNbr, pName, pDateTime, blocked, dDateTime from Pallets";
@@ -137,18 +154,18 @@ public class Database {
 			e.printStackTrace();
 		}
 	}
-
-	public void updateAmounts() {
+	
+	private void updateAmounts() {
 		String get = "select * from Materials";
 		try {
 			PreparedStatement ps = conn.prepareStatement(get);
-			in.setAmounts(ps.executeQuery());
+			in.updateAmounts(ps.executeQuery());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public boolean checkAmounts(String type, int amount) {
+	private boolean checkAmounts(String type, int amount) {
 		ArrayList<String> ingredients = pr.getProduct(type).getIngredients();
 		ArrayList<Integer> quantities = pr.getProduct(type).getQuantities();
 		if (!in.checkAvailable(ingredients, quantities, amount)) {
@@ -159,7 +176,7 @@ public class Database {
 
 	}
 
-	public boolean subtractAmounts(String type, int quantity) {
+	private boolean subtractAmounts(String type, int quantity) {
 		PreparedStatement ps;
 		try {
 			String get1 = "update Materials m, Recipes r" +
@@ -175,6 +192,13 @@ public class Database {
 		return true;
 	}
 
+	/**
+	 * Creates a number of pallets.
+	 * 
+	 * @param type Which type of pallet to create.
+	 * @param quantity How many pallets to create.
+	 * @return True if successful, false otherwise.
+	 */
 	public boolean createPallet(String type, int quantity) {
 		try {
 			if (checkAmounts(type, quantity)) {
@@ -206,6 +230,15 @@ public class Database {
 
 	}
 
+	/**
+	 * Changes the block status for an array of pallets.
+	 * 
+	 * @param rowIds The ID:s of the pallets in the PalletList to be
+	 * changed.
+	 * @param setting Whether the pallets should be blocked or unblocked.
+	 * @return The list of pallets. Value is -1 if no change has
+	 * been done.
+	 */
 	public int[] setBlock(int[] rowIds, boolean setting) {
 		String block = "update Pallets set blocked = ? where dDateTime is NULL and (pNbr = ?";
 		for(int i = 1;i<rowIds.length;i++)
@@ -232,9 +265,5 @@ public class Database {
 	public Product getProductInfo(String product) {
 		return pr.getProduct(product);
 	}
-
-	// public void createProduct(String product, int amount) {
-	//
-	// }
 
 }

@@ -4,17 +4,28 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+/**
+ * Holds a list of Pallets.
+ */
 public class PalletList {
 	public ArrayList<Pallet> palls;
 
+	/**
+	 * Creates a new list of Pallets.
+	 */
 	public PalletList() {
 		palls = new ArrayList<Pallet>();
 	}
 
-	public void add(Pallet p) {
-		palls.add(p);
-	}
-
+	/**
+	 * Changes the block status for a list of pallet.
+	 * 
+	 * @param pNbr Which pallets to be changed.
+	 * @param setting True if the pallets are to be blocked,
+	 * false otherwise.
+	 * @return The list of pallets. Value is -1 if no change has
+	 * been done.
+	 */
 	public int[] setBlock(int[] pNbr, boolean setting) {
 		for(int i = 0; i < pNbr.length; i++){
 			Pallet p = palls.get(pNbr[i]);
@@ -25,8 +36,12 @@ public class PalletList {
 		}
 		return pNbr;
 	}
-
 	
+	/**
+	 * Populates the list with Pallet objects.
+	 * 
+	 * @param info A set of results from the database.
+	 */
 	public void populate(ResultSet info) {
 		palls.clear();
 		try {
@@ -50,7 +65,6 @@ public class PalletList {
 				} while (info.next());
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

@@ -6,25 +6,40 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+
+/**
+ * Holds a map of Products.
+ */
 public class ProductMap {
 	private HashMap<String, Product> prod;
 
+	/**
+	 * Creates a new ProductMap object.
+	 */
 	public ProductMap() {
 		prod = new HashMap<String, Product>();
 	}
-
+	
+	/**
+	 * Returns a list of all the keys in the map.
+	 * 
+	 * @return A set of keys.
+	 */
 	public Set<String> keySet() {
 		return prod.keySet();
 	}
-
-	public void addProduct(String name, Product product) {
-		prod.put(name, product);
-	}
-
+	
+	/**
+	 * Returns a product object.
+	 * @param product The key to the product.
+	 * 
+	 * @return A product.
+	 */
 	public Product getProduct(String product) {
 		return prod.get(product);
 	}
 
+	
 	public void populate(ResultSet info) {
 		try {
 			info.first();
@@ -34,7 +49,7 @@ public class ProductMap {
 			do {
 				if (!currProd.equals(info.getString(1))) {
 					if (currProd != "") {
-						addProduct(currProd, new Product(currProd, ingredients,
+						prod.put(currProd, new Product(currProd, ingredients,
 								quantities));
 					}
 					currProd = info.getString(1);
@@ -44,10 +59,9 @@ public class ProductMap {
 				ingredients.add(info.getString(2));
 				quantities.add(info.getInt(3));
 			} while (info.next());
-			addProduct(currProd, new Product(currProd, ingredients,
+			prod.put(currProd, new Product(currProd, ingredients,
 					quantities));
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
