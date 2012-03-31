@@ -161,7 +161,6 @@ public class Database {
 	}
 
 	public boolean checkAmounts(String type) {
-
 		ArrayList<String> ingredients = pr.getProduct(type).getIngredients();
 		ArrayList<Integer> quantities = pr.getProduct(type).getQuantities();
 		if (!in.checkAvailable(ingredients, quantities)) {
