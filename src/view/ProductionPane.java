@@ -188,7 +188,11 @@ public class ProductionPane extends BasicPane{
 		 */
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if(db.createPallet((String) productList.getSelectedValue(), oldQuantity))
+			String s = (String) productList.getSelectedValue();
+			if(s == null){
+				messageLabel.setText("Please select a product!");
+				return;
+			}else if(db.createPallet((String) productList.getSelectedValue(), oldQuantity))
 				messageLabel.setText(oldQuantity + " pallets successfully created!");
 			else
 				messageLabel.setText("Pallets could not be created!");
