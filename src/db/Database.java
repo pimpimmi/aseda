@@ -33,14 +33,17 @@ public class Database {
 	 * @param ingr The ingredients.
 	 */
 	public Database(PalletList pall, ProductMap prod, Ingredients ingr) {
-		openConnection("db69", "shamoona");
 		pa = pall;
 		pr = prod;
 		in = ingr;
-		updateAmounts();
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		timeFormat = new SimpleDateFormat("HH:mm");
-
+	}
+	
+	/**
+	 * Updates the list of recipes.
+	 */
+	public void updateRecipes(){
 		String pop = "select * from Recipes";
 		try {
 			PreparedStatement ps = conn.prepareStatement(pop);
@@ -49,8 +52,15 @@ public class Database {
 			e.printStackTrace();
 		}
 	}
-
-	private boolean openConnection(String userName, String password) {
+	
+	/**
+	 * Open a connection to the database.
+	 * 
+	 * @param userName The username.
+	 * @param password The password.
+	 * @return True if connected, false otherwise.
+	 */
+	public boolean openConnection(String userName, String password) {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			conn = DriverManager.getConnection(
@@ -138,7 +148,6 @@ public class Database {
 			PreparedStatement ps = conn.prepareStatement(get);
 			for (int i = 1; i <= fields.size(); i++) {
 				String s = fields.get(i-1);
-				System.out.println(s + criteria[0]);
 				if (s.equals("pNbr")){
 					ps.setInt(i, Integer.valueOf(criteria[0]));
 				}if (s.equals("pName"))
@@ -148,14 +157,16 @@ public class Database {
 				if (s.equals("tpDateTime"))
 					ps.setString(i,criteria[4] + " " + criteria[5]);
 			}
-			System.out.println(ps.toString());
 			pa.populate(ps.executeQuery());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private void updateAmounts() {
+	/**
+	 * Updated the amount available for each ingredient.
+	 */
+	public void updateIngredients() {
 		String get = "select * from Materials";
 		try {
 			PreparedStatement ps = conn.prepareStatement(get);
@@ -188,7 +199,7 @@ public class Database {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		updateAmounts();
+		updateIngredients();
 		return true;
 	}
 

@@ -55,7 +55,14 @@ public class ProductionPane extends BasicPane{
 		this.pr = pr;
 		this.db = db;
 		oldQuantity = 1;
+		boolean connected = db.openConnection("db69", "shamoona");
+		db.updateRecipes();
+		db.updateIngredients();
 		setUpPane();
+		if(connected)
+			messageLabel.setText("Connected to database!");
+		else
+			messageLabel.setText("Could not connect to database!!");
 	}
 	
 	/**
@@ -245,6 +252,7 @@ public class ProductionPane extends BasicPane{
 		}
 		
 	}
+
 	
 
 }
