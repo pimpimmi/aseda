@@ -1,1 +1,2 @@
-To run the program using command prompt, open folder "dist" and type: "java -jar krusty_production.jar".
+To run the program using command prompt:
+Extract krusty.zip, open the folder named dist and type: "java -jar krusty_production.jar".
